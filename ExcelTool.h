@@ -13,6 +13,8 @@ public:
 	static ExcelTool* getInstance();
 
 	void Open();
+	void Open(CString excel_path);
 	void Close();
 	void Add(CString text);
+	void GetString(CString chinese,CString foreign,CString &result);
 };

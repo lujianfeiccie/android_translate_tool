@@ -61,6 +61,6 @@
 #include "Util\Util.h"
 #include "Util\Markup.h"
 #include "ExcelTool.h"
-
-#define FILE_NAME "\\translate.xls"
+#include "Util\Config.h"
+#define EXCEL_FILE_NAME "\\translate.xls"
 #define XML_FILE_NAME "\\strings.xml"

@@ -3,6 +3,7 @@
 //
 
 #pragma once
+#include "afxwin.h"
 
 
 // CTranslateForAndroidDlg ¶Ô»°¿ò
@@ -27,8 +28,18 @@ protected:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
+	afx_msg void OnClose();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedBtnGo();
+	afx_msg void OnBnClickedButtonTest();
+	// editor for xml path
+	CEdit m_edit_xml_path;
+	// editor for excel path
+	CEdit m_edit_excel_path;
+	afx_msg void OnBnClickedBtnXmlBrowser();
+	afx_msg void OnBnClickedBtnExcelBrowser();
+	// edit for language
+	CEdit m_edit_language;
 };

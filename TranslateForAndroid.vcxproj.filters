@@ -52,6 +52,9 @@
     <ClInclude Include="ExcelTool.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Util\Config.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TranslateForAndroid.cpp">
@@ -70,6 +73,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="ExcelTool.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\Config.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

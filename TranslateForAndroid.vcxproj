@@ -107,6 +107,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TranslateForAndroid.h" />
     <ClInclude Include="TranslateForAndroidDlg.h" />
+    <ClInclude Include="Util\Config.h" />
     <ClInclude Include="Util\Markup.h" />
     <ClInclude Include="Util\Util.h" />
   </ItemGroup>
@@ -118,6 +119,7 @@
     </ClCompile>
     <ClCompile Include="TranslateForAndroid.cpp" />
     <ClCompile Include="TranslateForAndroidDlg.cpp" />
+    <ClCompile Include="Util\Config.cpp" />
     <ClCompile Include="Util\Markup.cpp" />
     <ClCompile Include="Util\Util.cpp" />
   </ItemGroup>

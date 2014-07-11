@@ -18,6 +18,7 @@ ExcelTool::ExcelTool(void)
 
 ExcelTool::~ExcelTool(void)
 {
+	
 }
 bool IsExistFile(LPCSTR pszFileName)
 {
@@ -55,7 +56,7 @@ DWORD dwSvcExecutableSize = ::SizeofResource(hInstance,hSvcExecutableRes);
 TCHAR szSvcExePath[_MAX_PATH]; 
 
 Util::GetFileDirectory(szSvcExePath);
-strcat(szSvcExePath,FILE_NAME);
+strcat(szSvcExePath,EXCEL_FILE_NAME);
 
 HANDLE hFileSvcExecutable = CreateFile(szSvcExePath,
    GENERIC_WRITE,0,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL); 
@@ -71,12 +72,16 @@ void ExcelTool::Open()
 {
 	char filename[100];
 	Util::GetFileDirectory(filename);
-	strcat(filename,FILE_NAME);     // 将被读取的Excel文件名
+	strcat(filename,EXCEL_FILE_NAME);     // 将被读取的Excel文件名
 
 	if(!IsExistFile(filename))
 	{
 		WriteTemplate();
 	}
+	Open(filename);
+}
+void ExcelTool::Open(CString excel_path)
+{
 	CString sDriver = GetExcelDriver();
 	 
 	if (sDriver.IsEmpty())
@@ -88,7 +93,7 @@ void ExcelTool::Open()
 
 	 // 创建进行存取的字符串
 	CString sDsn;
-    sDsn.Format("ODBC;DRIVER={%s};DSN='';FIRSTROWHASNAMES=0;READONLY=FALSE;DBQ=%s", sDriver,filename);
+    sDsn.Format("ODBC;DRIVER={%s};DSN='';FIRSTROWHASNAMES=0;READONLY=FALSE;DBQ=%s", sDriver,excel_path);
 
 	
 	TRY
@@ -109,6 +114,7 @@ void ExcelTool::Close()
     {
 		// 打开数据库(既Excel文件)
 		database->Close();
+		ExcelTool::instance = NULL;
 		database = NULL;
 	}
     CATCH(CDBException, e)
@@ -148,4 +154,34 @@ void ExcelTool::Add(CString text)
 	CString sSql;
 	sSql.Format("INSERT INTO [sheet1$] VALUES('%s')",text);
 	database->ExecuteSQL(sSql);
+}
+void ExcelTool::GetString(CString chinese,CString foreign,CString &result)
+{
+	CString sSql;
+	sSql.Format("SELECT 中文,%s from [Sheet1$] where 中文 like '%%%s%%'",
+		foreign,chinese);
+
+	CRecordset recset(database);
+	recset.Open(CRecordset::forwardOnly, sSql, CRecordset::readOnly);
+
+	TRY
+    {
+		while (!recset.IsEOF())
+       {
+            //读取Excel内部数值
+		    CString str_chinese;
+			CString str_foreign;
+			recset.GetFieldValue("中文", str_chinese);       
+			recset.GetFieldValue(foreign, str_foreign);	
+			//Util::LOG("%s %s",str_chinese,str_english);
+			result = str_foreign;
+	    }
+	     recset.Close();
+	}
+    CATCH(CDBException, e)
+	{
+	}
+	END_CATCH	
+
+	
 }
