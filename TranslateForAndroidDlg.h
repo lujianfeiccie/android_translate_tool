@@ -42,4 +42,7 @@ public:
 	afx_msg void OnBnClickedBtnExcelBrowser();
 	// edit for language
 	CEdit m_edit_language;
+	// Xml path to excel
+	CEdit m_edit_xml_to_excel;
+	afx_msg void OnBnClickedBtnBrowserToExcel();
 };

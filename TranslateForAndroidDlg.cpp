@@ -60,6 +60,7 @@ void CTranslateForAndroidDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_XML_PATH, m_edit_xml_path);
 	DDX_Control(pDX, IDC_EDIT_EXCEL_PATH, m_edit_excel_path);
 	DDX_Control(pDX, IDC_EDIT_LANGUAGE, m_edit_language);
+	DDX_Control(pDX, IDC_EDIT_PATH_TO_EXCEL, m_edit_xml_to_excel);
 }
 
 BEGIN_MESSAGE_MAP(CTranslateForAndroidDlg, CDialogEx)
@@ -71,14 +72,18 @@ BEGIN_MESSAGE_MAP(CTranslateForAndroidDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_TEST, &CTranslateForAndroidDlg::OnBnClickedButtonTest)
 	ON_BN_CLICKED(IDC_BTN_XML_BROWSER, &CTranslateForAndroidDlg::OnBnClickedBtnXmlBrowser)
 	ON_BN_CLICKED(IDC_BTN_EXCEL_BROWSER, &CTranslateForAndroidDlg::OnBnClickedBtnExcelBrowser)
+	ON_BN_CLICKED(IDC_BTN_BROWSER_TO_EXCEL, &CTranslateForAndroidDlg::OnBnClickedBtnBrowserToExcel)
 END_MESSAGE_MAP()
 
 
 // CTranslateForAndroidDlg 消息处理程序
-void ReadFromFile(CString &xml_path,
+void ReadFromFile(CString &xml_to_excel,
+	CString &xml_path,
 	CString &excel_path,
 	CString &language)
 {
+	Config::ReadConfig("xml_to_excel_path",xml_to_excel.GetBuffer(1024));
+	xml_to_excel.ReleaseBuffer();
 	Config::ReadConfig("chinese_xml_path",xml_path.GetBuffer(1024));
 	xml_path.ReleaseBuffer();
 	Config::ReadConfig("excel_path",excel_path.GetBuffer(1024));
@@ -87,10 +92,12 @@ void ReadFromFile(CString &xml_path,
 	language.ReleaseBuffer();	
 }
 
-void WriteToFile(CString xml_path,
+void WriteToFile(CString &xml_to_excel,
+	CString xml_path,
 	CString excel_path,
 	CString language)
 {
+	Config::WriteConfig("xml_to_excel_path",xml_to_excel);
 	Config::WriteConfig("chinese_xml_path",xml_path);
 	Config::WriteConfig("excel_path",excel_path);	
 	Config::WriteConfig("language",language);	
@@ -125,10 +132,12 @@ BOOL CTranslateForAndroidDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
+	CString xml_to_excel_path;
 	CString xml_path;
 	CString excel_path;
 	CString language;
-	ReadFromFile(xml_path,excel_path,language);
+	ReadFromFile(xml_to_excel_path,xml_path,excel_path,language);
+	m_edit_xml_to_excel.SetWindowTextA(xml_to_excel_path);
 	m_edit_xml_path.SetWindowTextA(xml_path);
 	m_edit_excel_path.SetWindowTextA(excel_path);
 	m_edit_language.SetWindowTextA(language);
@@ -188,22 +197,36 @@ HCURSOR CTranslateForAndroidDlg::OnQueryDragIcon()
 
 void CTranslateForAndroidDlg::OnBnClickedBtnGo()
 {
-	// TODO: 在此添加控件通知处理程序代码
-	ExcelTool::getInstance()->Open();
+	CString xml_to_excel_path;
+	m_edit_xml_to_excel.GetWindowTextA(xml_to_excel_path);
+
+	if(""==xml_to_excel_path.Trim())
+	{
+			MessageBox("Xml path can't be empty");
+			return;
+	}
+	
+	char directory[1024];
+
+	Util::GetDirectoryByFileName(xml_to_excel_path,directory);
+	
+	strcat(directory,EXCEL_FILE_NAME);
+
+	
+	ExcelTool::getInstance()->OpenAndWriteTemplate(directory);
 
 	CMarkup xml;
 
-	char xmlfilename[100];
-	Util::GetFileDirectory(xmlfilename);
-	strcat(xmlfilename,XML_FILE_NAME);     // 将被读取的Excel文件名
-
-	Util::LOG("Load=%d",xml.Load(xmlfilename));
+	
+	Util::LOG("Load=%d",xml.Load(xml_to_excel_path));
 
 	while(xml.FindChildElem())
 	{
 	//	Util::LOG("%s",xml.GetChildData());
 		ExcelTool::getInstance()->Add(xml.GetChildData());
 	}	
+
+
 	ExcelTool::getInstance()->Close();
 	MessageBox("success");
 }
@@ -279,13 +302,28 @@ void CTranslateForAndroidDlg::OnBnClickedBtnExcelBrowser()
 }
 void CTranslateForAndroidDlg::OnClose()
 {
+	CString xml_to_excel_path;
 	CString xml_path;
 	CString excel_path;
 	CString language;
+	m_edit_xml_to_excel.GetWindowTextA(xml_to_excel_path);
 	m_edit_xml_path.GetWindowTextA(xml_path);
 	m_edit_excel_path.GetWindowTextA(excel_path);
 	m_edit_language.GetWindowTextA(language);
-	WriteToFile(xml_path,excel_path,language);
+	WriteToFile(xml_to_excel_path,xml_path,excel_path,language);
 	
 	CDialog::OnClose();	
+}
+
+void CTranslateForAndroidDlg::OnBnClickedBtnBrowserToExcel()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 在此添加控件通知处理程序代码
+	CString strFilter = "xml files(*.xml)|*.xml||";
+	CFileDialog FileDlg(true,NULL,NULL,
+						OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT,
+						(LPCSTR)strFilter,this);
+	if(FileDlg.DoModal()!=IDOK) return;
+	CString strFileName = FileDlg.GetPathName();
+	m_edit_xml_to_excel.SetWindowTextA(strFileName);
 }

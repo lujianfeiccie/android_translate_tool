@@ -6,13 +6,14 @@ private:
 	CString GetExcelDriver();
 	CDatabase* database;
 	void WriteTemplate();
+	void WriteTemplate(CString path);
 public:
 	
 	~ExcelTool(void);
 	static ExcelTool* instance;
 	static ExcelTool* getInstance();
 
-	void Open();
+	void OpenAndWriteTemplate(CString excel_path);
 	void Open(CString excel_path);
 	void Close();
 	void Add(CString text);

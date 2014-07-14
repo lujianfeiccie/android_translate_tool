@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "Util.h"
 
 Util::Util(void)
@@ -39,4 +39,13 @@ void Util::GetFileDirectory(char* fileDirectory)
 	sPath=sPath.Left (nPos);
 	strcpy(fileDirectory,sPath.GetBuffer());
 	sPath.ReleaseBuffer();
+}
+void Util::GetDirectoryByFileName(const char* fileName,char* directory)
+{
+	CString path;
+	path.Format("%s",fileName);
+	int start = path.ReverseFind('\\');
+	CString directory_str = path.Left(start);
+	strcpy(directory,directory_str.GetBuffer(1024));
+	directory_str.ReleaseBuffer();
 }

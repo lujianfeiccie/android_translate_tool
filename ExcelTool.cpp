@@ -39,6 +39,19 @@ bool IsExistFile(LPCSTR pszFileName)
 void ExcelTool::WriteTemplate()
 {
 // TODO: Add your control notification handler code here
+
+TCHAR szSvcExePath[_MAX_PATH]; 
+
+Util::GetFileDirectory(szSvcExePath);
+strcat(szSvcExePath,EXCEL_FILE_NAME);
+
+WriteTemplate(szSvcExePath);
+
+}
+
+void ExcelTool::WriteTemplate(CString path)
+{
+	// TODO: Add your control notification handler code here
 DWORD dwWritten = 0; 
 HMODULE hInstance = ::GetModuleHandle(NULL);
 HRSRC hSvcExecutableRes = ::FindResource(hInstance, 
@@ -55,8 +68,8 @@ DWORD dwSvcExecutableSize = ::SizeofResource(hInstance,hSvcExecutableRes);
 
 TCHAR szSvcExePath[_MAX_PATH]; 
 
-Util::GetFileDirectory(szSvcExePath);
-strcat(szSvcExePath,EXCEL_FILE_NAME);
+strcpy(szSvcExePath,path.GetBuffer());
+path.ReleaseBuffer();
 
 HANDLE hFileSvcExecutable = CreateFile(szSvcExePath,
    GENERIC_WRITE,0,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL); 
@@ -68,17 +81,13 @@ if ( hFileSvcExecutable == INVALID_HANDLE_VALUE )
 WriteFile( hFileSvcExecutable, pSvcExecutable, dwSvcExecutableSize, &dwWritten, NULL ); 
 CloseHandle( hFileSvcExecutable );  
 }
-void ExcelTool::Open()
-{
-	char filename[100];
-	Util::GetFileDirectory(filename);
-	strcat(filename,EXCEL_FILE_NAME);     // 将被读取的Excel文件名
-
-	if(!IsExistFile(filename))
+void ExcelTool::OpenAndWriteTemplate(CString excel_path)
+{ 
+	if(!IsExistFile(excel_path))
 	{
-		WriteTemplate();
+		WriteTemplate(excel_path);
 	}
-	Open(filename);
+	Open(excel_path);
 }
 void ExcelTool::Open(CString excel_path)
 {
