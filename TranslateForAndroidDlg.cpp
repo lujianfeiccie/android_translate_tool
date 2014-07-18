@@ -50,6 +50,7 @@ END_MESSAGE_MAP()
 
 CTranslateForAndroidDlg::CTranslateForAndroidDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CTranslateForAndroidDlg::IDD, pParent)
+	
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -61,6 +62,12 @@ void CTranslateForAndroidDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_EXCEL_PATH, m_edit_excel_path);
 	DDX_Control(pDX, IDC_EDIT_LANGUAGE, m_edit_language);
 	DDX_Control(pDX, IDC_EDIT_PATH_TO_EXCEL, m_edit_xml_to_excel);
+	DDX_Control(pDX, IDC_EDIT_DIRECTORY, m_edit_xml_directory);
+	DDX_Control(pDX, IDC_BTN_XML_BROWSER, m_btn_browser_xml_path);
+	DDX_Control(pDX, IDC_BTN_BROWSER_DIRECTORY, m_btn_browser_directory);
+	DDX_Control(pDX, IDC_RADIO_SINGLE, m_radio_single);
+	DDX_Control(pDX, IDC_RADIO_DIRECTORY, m_radio_directory);
+	DDX_Control(pDX, IDC_CHECK_FUZZY, m_check_fuzzy);
 }
 
 BEGIN_MESSAGE_MAP(CTranslateForAndroidDlg, CDialogEx)
@@ -73,6 +80,9 @@ BEGIN_MESSAGE_MAP(CTranslateForAndroidDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_XML_BROWSER, &CTranslateForAndroidDlg::OnBnClickedBtnXmlBrowser)
 	ON_BN_CLICKED(IDC_BTN_EXCEL_BROWSER, &CTranslateForAndroidDlg::OnBnClickedBtnExcelBrowser)
 	ON_BN_CLICKED(IDC_BTN_BROWSER_TO_EXCEL, &CTranslateForAndroidDlg::OnBnClickedBtnBrowserToExcel)
+	ON_BN_CLICKED(IDC_BTN_BROWSER_DIRECTORY, &CTranslateForAndroidDlg::OnBnClickedBtnBrowserDirectory)
+	ON_BN_CLICKED(IDC_RADIO_SINGLE, &CTranslateForAndroidDlg::OnBnClickedRadioSingle)
+	ON_BN_CLICKED(IDC_RADIO_DIRECTORY, &CTranslateForAndroidDlg::OnBnClickedRadioDirectory)
 END_MESSAGE_MAP()
 
 
@@ -80,7 +90,10 @@ END_MESSAGE_MAP()
 void ReadFromFile(CString &xml_to_excel,
 	CString &xml_path,
 	CString &excel_path,
-	CString &language)
+	CString &language,
+	CString &singleFile,
+	CString &directory,
+	CString &fuzzy)
 {
 	Config::ReadConfig("xml_to_excel_path",xml_to_excel.GetBuffer(1024));
 	xml_to_excel.ReleaseBuffer();
@@ -90,17 +103,29 @@ void ReadFromFile(CString &xml_to_excel,
 	excel_path.ReleaseBuffer();	
 	Config::ReadConfig("language",language.GetBuffer(1024));
 	language.ReleaseBuffer();	
+	Config::ReadConfig("singleFile",singleFile.GetBuffer(1024));
+	singleFile.ReleaseBuffer();	
+	Config::ReadConfig("directory",directory.GetBuffer(1024));
+	directory.ReleaseBuffer();	
+	Config::ReadConfig("fuzzy",fuzzy.GetBuffer(1024));
+	fuzzy.ReleaseBuffer();	
 }
 
 void WriteToFile(CString &xml_to_excel,
 	CString xml_path,
 	CString excel_path,
-	CString language)
+	CString language,
+	CString singleFile,
+	CString directory,
+	CString fuzzy)
 {
 	Config::WriteConfig("xml_to_excel_path",xml_to_excel);
 	Config::WriteConfig("chinese_xml_path",xml_path);
 	Config::WriteConfig("excel_path",excel_path);	
 	Config::WriteConfig("language",language);	
+	Config::WriteConfig("singleFile",singleFile);	
+	Config::WriteConfig("directory",directory);		
+	Config::WriteConfig("fuzzy",fuzzy);		
 }
 BOOL CTranslateForAndroidDlg::OnInitDialog()
 {
@@ -136,11 +161,19 @@ BOOL CTranslateForAndroidDlg::OnInitDialog()
 	CString xml_path;
 	CString excel_path;
 	CString language;
-	ReadFromFile(xml_to_excel_path,xml_path,excel_path,language);
+	CString singleFile;
+	CString directory;
+	CString fuzzy;
+	ReadFromFile(xml_to_excel_path,xml_path,excel_path,language,singleFile,directory,fuzzy);
 	m_edit_xml_to_excel.SetWindowTextA(xml_to_excel_path);
 	m_edit_xml_path.SetWindowTextA(xml_path);
 	m_edit_excel_path.SetWindowTextA(excel_path);
 	m_edit_language.SetWindowTextA(language);
+	m_edit_xml_directory.SetWindowTextA(directory);
+	setRadioEnableForSingle("1"==singleFile);
+	m_radio_single.SetCheck("1"==singleFile);
+	m_radio_directory.SetCheck("1"!=singleFile);
+	m_check_fuzzy.SetCheck("1"==fuzzy);
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -231,48 +264,99 @@ void CTranslateForAndroidDlg::OnBnClickedBtnGo()
 	MessageBox("success");
 }
 
+void CTranslateForAndroidDlg::ReadAllFilesInDir(CString dir)
+{
+	   CFileFind fileFinder;
+       CString filePath = dir + _T("//*.*");
+      
+       BOOL bFinished = fileFinder.FindFile(filePath);
+       while(bFinished)  //每次循环对应一个类别目录
+       {
+              bFinished = fileFinder.FindNextFile();
+              if(fileFinder.IsDirectory() && !fileFinder.IsDots())  //若是目录则递归调用此方法
+              {
+                     ReadAllFilesInDir(fileFinder.GetFilePath());
+              }
+              else  //再判断是否为txt文件
+              {
+                     //获取文件类型
+                     CString fileName = fileFinder.GetFileName();
+					 
+                     int dotPos=fileName.ReverseFind('.');
+                     CString fileExt=fileName.Right(fileName.GetLength()-dotPos);
+                     if(fileExt == _T(".xml"))  //若是txt文件则开始分类测试
+                     {
+                     Util::LOG("%s",fileFinder.GetFilePath()); 
+					 CString language;
+					 m_edit_language.GetWindowTextA(language);
+					 WriteXml(fileFinder.GetFilePath(),language);
+                     }
+              }
+       }
+ 
+       fileFinder.Close();
+}
+void CTranslateForAndroidDlg::WriteXml(CString filePath,CString language)
+{
+	CMarkup xml;
 
+	Util::LOG("Load=%d",xml.Load(filePath));
+
+	CString result;
+	while(xml.FindChildElem())
+	{
+			//Util::LOG("%s",xml.GetChildData());
+		ExcelTool::getInstance()->GetString(xml.GetChildData(),language,result,m_check_fuzzy.GetCheck());
+		xml.SetChildData(result);
+	}	
+	xml.Save(filePath);
+}
 void CTranslateForAndroidDlg::OnBnClickedButtonTest()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	CString excel_path;
 	CString xml_path;
 	CString language;
-	
+	CString xml_directory;
 	m_edit_excel_path.GetWindowTextA(excel_path);
 	m_edit_xml_path.GetWindowTextA(xml_path);
 	m_edit_language.GetWindowTextA(language);
+	m_edit_xml_directory.GetWindowTextA(xml_directory);
 
+	if(m_radio_single.GetCheck()!=0){
+		if(""==xml_path.Trim())
+		{
+			MessageBox("CHN Xml path can not be empty!");
+			return;
+		}
+	}else{
+		if(""==xml_directory.Trim())
+		{
+			MessageBox("CHN Directory can not be empty!");
+			return;
+		}
+	}
 	if(""==excel_path.Trim() ||
-		""==xml_path.Trim() ||
 		""==language.Trim())
 	{
-		MessageBox("Edit Box can not be empty!");
+		MessageBox("Excel path or language can not be empty");
 		return;
 	}
 
-
-	ExcelTool::getInstance()->Open(excel_path);
+	if(m_radio_single.GetCheck()!=0){
+		ExcelTool::getInstance()->Open(excel_path);
 	
-	CMarkup xml;
-
+		WriteXml(xml_path,language);
 	
-	Util::LOG("Load=%d",xml.Load(xml_path));
+		ExcelTool::getInstance()->Close();
 
-	
-
-	CString result;
-	while(xml.FindChildElem())
-	{
-		//Util::LOG("%s",xml.GetChildData());
-		ExcelTool::getInstance()->GetString(xml.GetChildData(),language,result);
-		xml.SetChildData(result);
-	}	
-	xml.Save(xml_path);
-	
-	ExcelTool::getInstance()->Close();
-
-	MessageBox("success");
+		MessageBox("success");
+	}else{
+		ExcelTool::getInstance()->Open(excel_path);
+		ReadAllFilesInDir(xml_directory);
+		ExcelTool::getInstance()->Close();
+		MessageBox("success");
+	}
 }
 
 
@@ -306,11 +390,28 @@ void CTranslateForAndroidDlg::OnClose()
 	CString xml_path;
 	CString excel_path;
 	CString language;
+	CString singleFile;
+	CString directory;
+	CString fuzzy;
 	m_edit_xml_to_excel.GetWindowTextA(xml_to_excel_path);
 	m_edit_xml_path.GetWindowTextA(xml_path);
 	m_edit_excel_path.GetWindowTextA(excel_path);
 	m_edit_language.GetWindowTextA(language);
-	WriteToFile(xml_to_excel_path,xml_path,excel_path,language);
+	m_edit_xml_directory.GetWindowTextA(directory);
+	
+	if(m_radio_single.GetCheck()!=0)
+	{
+		singleFile = "1";
+	}else{
+		singleFile = "0";
+	}
+	if(m_check_fuzzy.GetCheck()!=0)
+	{
+		fuzzy = "1";
+	}else{
+		fuzzy = "0";
+	}
+	WriteToFile(xml_to_excel_path,xml_path,excel_path,language,singleFile,directory,fuzzy);
 	
 	CDialog::OnClose();	
 }
@@ -326,4 +427,60 @@ void CTranslateForAndroidDlg::OnBnClickedBtnBrowserToExcel()
 	if(FileDlg.DoModal()!=IDOK) return;
 	CString strFileName = FileDlg.GetPathName();
 	m_edit_xml_to_excel.SetWindowTextA(strFileName);
+}
+CString CTranslateForAndroidDlg::ShowDirectoryDlg()
+{
+	 TCHAR           szFolderPath[MAX_PATH] = {0};  
+        CString         strFolderPath = TEXT("");  
+          
+        BROWSEINFO      sInfo;  
+        ::ZeroMemory(&sInfo, sizeof(BROWSEINFO));  
+        sInfo.pidlRoot   = 0;  
+        sInfo.lpszTitle   = _T("请选择一个文件夹：");  
+        sInfo.ulFlags   = BIF_DONTGOBELOWDOMAIN | BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE | BIF_EDITBOX;  
+        sInfo.lpfn     = NULL;  
+  
+        // 显示文件夹选择对话框  
+        LPITEMIDLIST lpidlBrowse = ::SHBrowseForFolder(&sInfo);   
+        if (lpidlBrowse != NULL)  
+        {  
+            // 取得文件夹名  
+            if (::SHGetPathFromIDList(lpidlBrowse,szFolderPath))    
+            {  
+                strFolderPath = szFolderPath;  
+            }  
+        }  
+        if(lpidlBrowse != NULL)  
+        {  
+            ::CoTaskMemFree(lpidlBrowse);  
+        }  
+  
+        return strFolderPath;  
+}
+
+void CTranslateForAndroidDlg::OnBnClickedBtnBrowserDirectory()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	m_edit_xml_directory.SetWindowTextA(ShowDirectoryDlg());
+}
+
+void CTranslateForAndroidDlg::setRadioEnableForSingle(BOOL m_b_flag)
+{
+	m_edit_xml_path.EnableWindow(m_b_flag);
+	m_btn_browser_xml_path.EnableWindow(m_b_flag);
+
+	m_edit_xml_directory.EnableWindow(!m_b_flag);
+	m_btn_browser_directory.EnableWindow(!m_b_flag);
+}
+void CTranslateForAndroidDlg::OnBnClickedRadioSingle()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	setRadioEnableForSingle(TRUE);
+}
+
+
+void CTranslateForAndroidDlg::OnBnClickedRadioDirectory()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	setRadioEnableForSingle(FALSE);
 }

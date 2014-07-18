@@ -164,12 +164,16 @@ void ExcelTool::Add(CString text)
 	sSql.Format("INSERT INTO [sheet1$] VALUES('%s')",text);
 	database->ExecuteSQL(sSql);
 }
-void ExcelTool::GetString(CString chinese,CString foreign,CString &result)
+void ExcelTool::GetString(CString chinese,CString foreign,CString &result,BOOL fuzzy)
 {
 	CString sSql;
-	sSql.Format("SELECT 中文,%s from [Sheet1$] where 中文 like '%%%s%%'",
+	if(fuzzy==TRUE){
+		sSql.Format("SELECT 中文,%s from [Sheet1$] where 中文 like '%%%s%%'",
 		foreign,chinese);
-
+	}else{
+		sSql.Format("SELECT 中文,%s from [Sheet1$] where 中文 like '%s'",
+		foreign,chinese);
+	}
 	CRecordset recset(database);
 	recset.Open(CRecordset::forwardOnly, sSql, CRecordset::readOnly);
 

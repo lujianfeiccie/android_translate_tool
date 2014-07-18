@@ -45,4 +45,24 @@ public:
 	// Xml path to excel
 	CEdit m_edit_xml_to_excel;
 	afx_msg void OnBnClickedBtnBrowserToExcel();
+	// Directory with Xml files in it
+	CEdit m_edit_xml_directory;
+	afx_msg void OnBnClickedBtnBrowserDirectory();
+	afx_msg void OnBnClickedRadioSingle();
+	afx_msg void OnBnClickedRadioDirectory();
+    void setRadioEnableForSingle(BOOL m_b_flag);
+	CString ShowDirectoryDlg();
+	void WriteXml(CString filePath,CString language);
+	void ReadAllFilesInDir(CString dir);
+	// Browser for xml path
+	CButton m_btn_browser_xml_path;
+	// Browser for directory
+	CButton m_btn_browser_directory;
+	
+	// Radio for single
+	CButton m_radio_single;
+	// Radio for directory
+	CButton m_radio_directory;
+	// Check box for fuzzy search
+	CButton m_check_fuzzy;
 };
