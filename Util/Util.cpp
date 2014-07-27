@@ -49,3 +49,11 @@ void Util::GetDirectoryByFileName(const char* fileName,char* directory)
 	strcpy(directory,directory_str.GetBuffer(1024));
 	directory_str.ReleaseBuffer();
 }
+void Util::getUrl(char* url,char* q,char* from,char* to)
+{
+	CString tmp;
+	tmp.Format("%s?client_id=%s&q=%s&from=%s&to=%s",
+		API_URL,API_KEY,q,from,to);
+	strcpy(url,tmp.GetBuffer());
+	tmp.ReleaseBuffer();
+}

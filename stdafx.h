@@ -58,9 +58,14 @@
 #include <afxdb.h>
 #include <odbcinst.h>
 
+#include <afxinet.h>
 #include "Util\Util.h"
 #include "Util\Markup.h"
 #include "ExcelTool.h"
 #include "Util\Config.h"
+#include "Util\HttpTool.h"
 #define EXCEL_FILE_NAME "\\translate.xls"
 #define XML_FILE_NAME "\\strings.xml"
+#define API_KEY "MBawO2XZY7ULN8uYLC4NCHjr"
+#define API_URL "http://openapi.baidu.com/public/2.0/bmt/translate"
+

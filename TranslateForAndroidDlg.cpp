@@ -6,7 +6,7 @@
 #include "TranslateForAndroid.h"
 #include "TranslateForAndroidDlg.h"
 #include "afxdialogex.h"
-
+#include "TranslateApiDlg.h"
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -86,6 +86,7 @@ BEGIN_MESSAGE_MAP(CTranslateForAndroidDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_RADIO_SINGLE, &CTranslateForAndroidDlg::OnBnClickedRadioSingle)
 	ON_BN_CLICKED(IDC_RADIO_DIRECTORY, &CTranslateForAndroidDlg::OnBnClickedRadioDirectory)
 	ON_MESSAGE(WM_MSG_STATUS,&CTranslateForAndroidDlg::OnMessageReceive)
+	ON_COMMAND(ID_TOOL_TRANSLATE, &CTranslateForAndroidDlg::OnToolTranslate)
 END_MESSAGE_MAP()
 
 
@@ -578,3 +579,11 @@ void CTranslateForAndroidDlg::OnClose()
 	
 	CDialog::OnClose();	
 }
+
+void CTranslateForAndroidDlg::OnToolTranslate()
+{
+	// TODO: 在此添加命令处理程序代码
+	CTranslateApiDlg dlg;
+	dlg.DoModal();
+}
+

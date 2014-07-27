@@ -55,6 +55,24 @@
     <ClInclude Include="Util\Config.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="TranslateApiDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\HttpTool.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Json\config.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Json\reader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Json\value.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Json\writer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TranslateForAndroid.cpp">
@@ -76,6 +94,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Util\Config.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TranslateApiDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\HttpTool.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
