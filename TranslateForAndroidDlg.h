@@ -5,7 +5,19 @@
 #pragma once
 #include "afxwin.h"
 
+const int WM_MSG_STATUS = WM_USER+100;
 
+enum MSG_TYPE
+{
+	MSG_Processing,
+	MSG_Finish,
+	MSG_FinishParagraphProcessing,
+	MSG_Loading,
+	MSG_XML_PATH_Empty
+};
+static UINT indicators[]={
+IDS_STRING_STATUS
+};
 // CTranslateForAndroidDlg ¶Ô»°¿ò
 class CTranslateForAndroidDlg : public CDialogEx
 {
@@ -65,4 +77,21 @@ public:
 	CButton m_radio_directory;
 	// Check box for fuzzy search
 	CButton m_check_fuzzy;
+	CStatusBar m_statusbar_status;
+
+	LONG OnMessageReceive(WPARAM wParam,LPARAM lParam);
+	void SendMessageStatus(MSG_TYPE type);
+
+	CString m_str_xml_to_excel_path;
+
+	CString m_str_excel_path;
+	CString m_str_xml_path;
+	CString m_str_language;
+	CString m_str_xml_directory;
+	int m_int_check_fuzzy;
+	CButton m_btn_go_xml2excel;
+	CButton m_btn_go_excel2xml;
+
+	BOOL PreTranslateMessage(MSG* pMsg);
+
 };
