@@ -161,7 +161,7 @@ CString ExcelTool::GetExcelDriver()
 void ExcelTool::Add(CString text)
 {
 	CString sSql;
-	sSql.Format("INSERT INTO [sheet1$] VALUES('%s')",text);
+	sSql.Format("INSERT INTO [sheet1$](ÖÐÎÄ) VALUES('%s')",text);
 	database->ExecuteSQL(sSql);
 }
 void ExcelTool::GetString(CString chinese,CString foreign,CString &result,BOOL fuzzy)

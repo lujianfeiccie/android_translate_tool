@@ -7,6 +7,7 @@ public:
 	static void GetFileDirectory(char* fileDirectory);
 	static void GetDirectoryByFileName(const char* fileName,char* directory);
 	static void getUrl(char* url,char* q,char* from="auto",char* to="auto");
+	static	int UTF8ToGBK(CString &strOut,const char* szSrc);
 public:
  ~Util(void);
 };

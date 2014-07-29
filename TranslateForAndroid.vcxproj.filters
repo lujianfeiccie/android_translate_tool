@@ -37,9 +37,6 @@
     <ClInclude Include="stdafx.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="Resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -61,16 +58,7 @@
     <ClInclude Include="Util\HttpTool.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Json\config.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Json\reader.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Json\value.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Json\writer.h">
+    <ClInclude Include="targetver.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

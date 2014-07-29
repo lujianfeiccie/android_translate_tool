@@ -72,6 +72,26 @@ void CTranslateApiDlg::OnClose()
 }
 void CALL_BACK_HTTP(unsigned long code,char* result)
 {
+	Json::Reader reader;
+	Json::Value value;
+	CString cstr_from;
+	CString cstr_to;
+	CString cstr_src;
+	CString cstr_dst;
+	if(reader.parse(result,value))
+	{
+		std::string str_from = value["from"].asString();
+		std::string str_to = value["to"].asString();
+		cstr_from = str_from.c_str();
+		cstr_to = str_to.c_str();
+		Json::Value trans_result = value["trans_result"];
+		int index = 0;
+		std::string str_src = trans_result[index]["src"].asString();
+		std::string str_dst = trans_result[index]["dst"].asString();
+		cstr_src = str_src.c_str();
+		//cstr_dst = str_dst.c_str();
+		Util::UTF8ToGBK(cstr_dst,str_dst.c_str());		
+	}
 
 }
 UINT ThreadHttpRequest(LPVOID lpvoid)

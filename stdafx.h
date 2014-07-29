@@ -59,11 +59,14 @@
 #include <odbcinst.h>
 
 #include <afxinet.h>
+#include "json\json.h"
+//#pragma comment(lib,"json_vc71_libmt.lib")
 #include "Util\Util.h"
 #include "Util\Markup.h"
 #include "ExcelTool.h"
 #include "Util\Config.h"
 #include "Util\HttpTool.h"
+
 #define EXCEL_FILE_NAME "\\translate.xls"
 #define XML_FILE_NAME "\\strings.xml"
 #define API_KEY "MBawO2XZY7ULN8uYLC4NCHjr"
