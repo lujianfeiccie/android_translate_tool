@@ -19,7 +19,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>Static</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -113,20 +113,23 @@
     <None Include="translate.xls" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Config.h" />
     <ClInclude Include="ExcelTool.h" />
+    <ClInclude Include="HttpTool.h" />
+    <ClInclude Include="Markup.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TranslateApiDlg.h" />
     <ClInclude Include="TranslateForAndroid.h" />
     <ClInclude Include="TranslateForAndroidDlg.h" />
-    <ClInclude Include="Util\Config.h" />
-    <ClInclude Include="Util\HttpTool.h" />
-    <ClInclude Include="Util\Markup.h" />
-    <ClInclude Include="Util\Util.h" />
+    <ClInclude Include="Util.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Config.cpp" />
     <ClCompile Include="ExcelTool.cpp" />
+    <ClCompile Include="HttpTool.cpp" />
+    <ClCompile Include="Markup.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -134,10 +137,7 @@
     <ClCompile Include="TranslateApiDlg.cpp" />
     <ClCompile Include="TranslateForAndroid.cpp" />
     <ClCompile Include="TranslateForAndroidDlg.cpp" />
-    <ClCompile Include="Util\Config.cpp" />
-    <ClCompile Include="Util\HttpTool.cpp" />
-    <ClCompile Include="Util\Markup.cpp" />
-    <ClCompile Include="Util\Util.cpp" />
+    <ClCompile Include="Util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TranslateForAndroid.rc" />

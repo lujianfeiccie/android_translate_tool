@@ -9,7 +9,7 @@ CHttpTool::~CHttpTool(void)
 {
 }
 
-void CHttpTool::request(char* url,HTTP_TOOL_CALL_BACK callback)
+void CHttpTool::request(TCHAR* url,HTTP_TOOL_CALL_BACK callback)
 {
 	DWORD dwServiceType;
 	CString strServerName;
@@ -32,13 +32,13 @@ void CHttpTool::request(char* url,HTTP_TOOL_CALL_BACK callback)
 	CHttpFile* pFile = pConnection->OpenRequest( CHttpConnection::HTTP_VERB_GET,
 												strObject);
 
-	CString szHeaders = "Accept: audio/x-aiff, audio/basic, audio/midi,\
+	CString szHeaders = L"Accept: audio/x-aiff, audio/basic, audio/midi,\
 						 audio/mpeg, audio/wav, image/jpeg, image/gif, image/jpg, image/png,\
 						 image/mng, image/bmp, text/plain, text/html, text/htm\r\n";
 
 	pFile->AddRequestHeaders(szHeaders);
 
-	Util::LOG("SendRequest");
+	Util::LOG(L"SendRequest");
 	pFile->SendRequest();
 
 	DWORD dwRet;
@@ -49,7 +49,7 @@ void CHttpTool::request(char* url,HTTP_TOOL_CALL_BACK callback)
 	if(dwRet != HTTP_STATUS_OK)
 	{
 		CString errText;
-		errText.Format("ÇëÇó³ö´í£¬´íÎóÂë£º%d", dwRet);
+		errText.Format(L"ÇëÇó³ö´í£¬´íÎóÂë£º%d", dwRet);
 		AfxMessageBox(errText);
 	}
 	else
@@ -58,8 +58,8 @@ void CHttpTool::request(char* url,HTTP_TOOL_CALL_BACK callback)
 		char buf[2000];
 		int numread;
 		CString filepath;
-		CString strFile = "response.txt";
-		filepath.Format(".\\%s", strFile);
+		CString strFile = L"response.txt";
+		filepath.Format(TEXT(".\\%s"), strFile);
 		//CFile myfile( filepath,
 			//		  CFile::modeCreate|CFile::modeWrite|CFile::typeBinary);
 		while ((numread = pFile->Read(buf,sizeof(buf)-1)) > 0)

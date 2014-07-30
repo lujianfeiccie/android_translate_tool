@@ -14,7 +14,7 @@ IMPLEMENT_DYNAMIC(CTranslateApiDlg, CDialogEx)
 CTranslateApiDlg::CTranslateApiDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CTranslateApiDlg::IDD, pParent)
 {
-
+	
 }
 
 CTranslateApiDlg::~CTranslateApiDlg()
@@ -70,7 +70,7 @@ void CTranslateApiDlg::OnClose()
 {
 	CDialog::OnClose();	
 }
-void CALL_BACK_HTTP(unsigned long code,char* result)
+void CALL_BACK_HTTP(unsigned long code,TCHAR* result)
 {
 	Json::Reader reader;
 	Json::Value value;
@@ -78,7 +78,11 @@ void CALL_BACK_HTTP(unsigned long code,char* result)
 	CString cstr_to;
 	CString cstr_src;
 	CString cstr_dst;
-	if(reader.parse(result,value))
+
+	char result_tmp[1024];
+		Util::wcharTochar(result,result_tmp,sizeof(result));
+	
+	if(reader.parse(result_tmp,value))
 	{
 		std::string str_from = value["from"].asString();
 		std::string str_to = value["to"].asString();
@@ -89,19 +93,19 @@ void CALL_BACK_HTTP(unsigned long code,char* result)
 		std::string str_src = trans_result[index]["src"].asString();
 		std::string str_dst = trans_result[index]["dst"].asString();
 		cstr_src = str_src.c_str();
-		//cstr_dst = str_dst.c_str();
-		Util::UTF8ToGBK(cstr_dst,str_dst.c_str());		
+		cstr_dst = str_dst.c_str();
+
 	}
 
 }
 UINT ThreadHttpRequest(LPVOID lpvoid)
 {	
-	char url_request_tmp[500];
-	Util::getUrl(url_request_tmp,"today","auto","auto");
+	TCHAR url_request_tmp[500];
+	Util::getUrl(url_request_tmp,L"½ñÌì",L"zh",L"en");
 	
 	CHttpTool httpTool;
 	httpTool.request(url_request_tmp,CALL_BACK_HTTP);
-	Util::LOG("Finish");
+	Util::LOG(L"Finish");
 	return 0;
 }
 
