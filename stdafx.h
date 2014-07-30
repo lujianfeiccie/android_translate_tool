@@ -69,6 +69,6 @@
 
 #define EXCEL_FILE_NAME L"\\translate.xls"
 #define XML_FILE_NAME L"\\strings.xml"
-#define API_KEY "MBawO2XZY7ULN8uYLC4NCHjr"
-#define API_URL "http://openapi.baidu.com/public/2.0/bmt/translate"
+#define API_KEY L"MBawO2XZY7ULN8uYLC4NCHjr"
+#define API_URL L"http://openapi.baidu.com/public/2.0/bmt/translate"
 

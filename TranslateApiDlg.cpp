@@ -80,7 +80,7 @@ void CALL_BACK_HTTP(unsigned long code,TCHAR* result)
 	CString cstr_dst;
 
 	char result_tmp[1024];
-		Util::wcharTochar(result,result_tmp,sizeof(result));
+		Util::wcharTochar(result,result_tmp,sizeof(result_tmp));
 	
 	if(reader.parse(result_tmp,value))
 	{
@@ -91,7 +91,7 @@ void CALL_BACK_HTTP(unsigned long code,TCHAR* result)
 		Json::Value trans_result = value["trans_result"];
 		int index = 0;
 		std::string str_src = trans_result[index]["src"].asString();
-		std::string str_dst = trans_result[index]["dst"].asString();
+		std::string str_dst = trans_result[index]["dst"].asCString();
 		cstr_src = str_src.c_str();
 		cstr_dst = str_dst.c_str();
 
@@ -101,7 +101,7 @@ void CALL_BACK_HTTP(unsigned long code,TCHAR* result)
 UINT ThreadHttpRequest(LPVOID lpvoid)
 {	
 	TCHAR url_request_tmp[500];
-	Util::getUrl(url_request_tmp,L"½ñÌì",L"zh",L"en");
+	Util::getUrl(url_request_tmp,L"Today",L"en",L"zh");
 	
 	CHttpTool httpTool;
 	httpTool.request(url_request_tmp,CALL_BACK_HTTP);
