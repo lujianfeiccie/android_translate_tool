@@ -91,10 +91,17 @@ void CALL_BACK_HTTP(unsigned long code,TCHAR* result)
 		Json::Value trans_result = value["trans_result"];
 		int index = 0;
 		std::string str_src = trans_result[index]["src"].asString();
-		std::string str_dst = trans_result[index]["dst"].asCString();
+		std::string str_dst = trans_result[index]["dst"].asString();
+		
 		cstr_src = str_src.c_str();
 		cstr_dst = str_dst.c_str();
+		
+		OutputDebugString(TEXT("String=")+cstr_dst);
+		//unsigned char high = str_dst.c_str()[0];
+		//unsigned char low = str_dst.c_str()[1];
 
+		//char str_tmp[1024];
+		//Util::enc_utf8_to_unicode_one(str_dst.c_str(),str_tmp);
 	}
 
 }
