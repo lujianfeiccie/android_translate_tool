@@ -7,20 +7,20 @@ Util::Util(void)
 Util::~Util(void)
 {
 }
-void __cdecl Util::LOG(const TCHAR* fmt, ...)
+void __cdecl Util::LOG(const TCHAR *format, ...)
 {
-	/*char buf[4096], *p = buf;
+	TCHAR buf[4096], *p = buf;
 	va_list args;
 	va_start(args, format);
-	p += _vsnprintf(p, sizeof buf - 1, fmt, args);
+	p += _vsntprintf(p, sizeof buf - 1, format, args);
 	va_end(args);
 	while ( p > buf  &&  isspace(p[-1]) )
 	*--p = '/0';
 	*p++ = '/r';
 	*p++ = '/n';
 	*p   = '/0';
-	OutputDebugString(buf);*/
-}  
+	OutputDebugString(buf);
+}
 void Util::GetFileDirectory(TCHAR* fileDirectory)
 {
 	CString sPath;
@@ -241,3 +241,43 @@ int Util::enc_utf8_to_unicode_one(const unsigned char* pInput, unsigned long *Un
   
     return utfbytes;  
 }  
+
+// 进行Url编码 UTF-8 
+CString Util::UrlEncode(CString strUnicode)
+{
+  LPCWSTR unicode = T2CW(strUnicode);
+  /*
+  int WideCharToMultiByte(
+UINT CodePage, //指定执行转换的代码页
+DWORD dwFlags, //允许你进行额外的控制，它会影响使用了读音符号（比如重音）的字符
+LPCWSTR lpWideCharStr, //指定要转换为宽字节字符串的缓冲区
+int cchWideChar, //指定由参数lpWideCharStr指向的缓冲区的字符个数
+LPSTR lpMultiByteStr, //指向接收被转换字符串的缓冲区
+int cchMultiByte, //指定由参数lpMultiByteStr指向的缓冲区最大值
+LPCSTR lpDefaultChar, //遇到一个不能转换的宽字符，函数便会使用pDefaultChar参数指向的字符
+LPBOOL pfUsedDefaultChar //至少有一个字符不能转换为其多字节形式，函数就会把这个变量设为TRUE
+);
+  */
+	 int len = WideCharToMultiByte(CP_UTF8, 0, unicode, -1, 0, 0, 0, 0);//获取utf8编码的字节长度
+	 if (!len)
+	  return strUnicode;
+	 
+	 char *utf8 = new char[len + 1];
+	 char *utf8temp = utf8;
+	 WideCharToMultiByte(CP_UTF8, 0, unicode, -1, utf8, len + 1, 0, 0);//转换成utf8编码
+
+
+	 //转换成url编码——每个字节前面带%的字符串
+	 utf8[len] = NULL;   
+	 CString strTemp, strEncodeData; 
+	 while (*utf8 != '\0') 
+	 { 
+	  strTemp.Format(_T("%%%2x"), (BYTE)*utf8); 
+	  strEncodeData += strTemp; 
+	  ++utf8; 
+	 } 
+
+	 delete []utf8temp;
+	
+	 return CString(strEncodeData);
+}

@@ -96,7 +96,6 @@ void CALL_BACK_HTTP(unsigned long code,TCHAR* result)
 		cstr_src = str_src.c_str();
 		cstr_dst = str_dst.c_str();
 		
-		OutputDebugString(TEXT("String=")+cstr_dst);
 		//unsigned char high = str_dst.c_str()[0];
 		//unsigned char low = str_dst.c_str()[1];
 
@@ -108,11 +107,16 @@ void CALL_BACK_HTTP(unsigned long code,TCHAR* result)
 UINT ThreadHttpRequest(LPVOID lpvoid)
 {	
 	TCHAR url_request_tmp[500];
-	Util::getUrl(url_request_tmp,L"Today",L"en",L"zh");
 	
-	CHttpTool httpTool;
-	httpTool.request(url_request_tmp,CALL_BACK_HTTP);
-	Util::LOG(L"Finish");
+//	unsigned long low2= tmp[3];
+	
+	CString q = Util::UrlEncode(L"½ñ");
+	Util::getUrl(url_request_tmp,q.GetBuffer(),L"zh",L"en");
+	q.ReleaseBuffer();	
+
+	/*CHttpTool httpTool;
+	httpTool.request(url_request_tmp,CALL_BACK_HTTP);*/
+	//Util::LOG(L"Finish");
 	return 0;
 }
 
