@@ -1,6 +1,6 @@
 #pragma once
 #include "afxwin.h"
-#include <list>
+#include <vector>
 
 // TranslateApiDlg ¶Ô»°¿ò
 
@@ -9,6 +9,7 @@ typedef struct
 	CString name;
 	CString value;
 }combo_value_type;
+
 
 class CTranslateApiDlg : public CDialogEx
 {
@@ -37,9 +38,12 @@ public:
 	CComboBox m_combo_to;
 	CEdit m_edit_from;
 	CEdit m_edit_to;
-	std::list<combo_value_type> m_list_combo;
+	std::vector<combo_value_type> m_list_combo;
 
 	void addCombo(CString key,CString value);
 	afx_msg void OnCbnSelchangeComboFrom();
-	afx_msg void OnCbnSelchangeComboTo();
+	afx_msg void OnCbnSelchangeComboTo();	
+	CStatusBar m_statusbar_status;
+	void SendMessageStatus(MSG_TYPE type);
+	LONG OnMessageReceive(WPARAM wParam,LPARAM lParam);
 };

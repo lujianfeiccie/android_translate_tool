@@ -6,7 +6,9 @@
 #include "TranslateApiDlg.h"
 #include "afxdialogex.h"
 
-
+UINT indicators_translate_api_dlg[]={
+IDS_STRING_STATUS
+};
 // CTranslateApiDlg 对话框
 
 IMPLEMENT_DYNAMIC(CTranslateApiDlg, CDialogEx)
@@ -19,6 +21,38 @@ CTranslateApiDlg::CTranslateApiDlg(CWnd* pParent /*=NULL*/)
 
 CTranslateApiDlg::~CTranslateApiDlg()
 {
+}
+
+void CTranslateApiDlg::DoDataExchange(CDataExchange* pDX)
+{
+	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_EDIT_PATH, m_edit_excel_path);
+	DDX_Control(pDX, IDC_COMBO_FROM, m_combo_from);
+	DDX_Control(pDX, IDC_COMBO_TO, m_combo_to);
+	DDX_Control(pDX, IDC_EDIT_FROM, m_edit_from);
+	DDX_Control(pDX, IDC_EDIT_TO, m_edit_to);
+}
+
+
+BEGIN_MESSAGE_MAP(CTranslateApiDlg, CDialogEx)
+	ON_WM_CLOSE()
+	
+	ON_BN_CLICKED(IDC_BTN_GO_TRANSLATE, &CTranslateApiDlg::OnBnClickedBtnGoTranslate)
+	ON_BN_CLICKED(IDC_BTN_BROWSER, &CTranslateApiDlg::OnBnClickedBtnBrowser)
+	ON_CBN_SELCHANGE(IDC_COMBO_FROM, &CTranslateApiDlg::OnCbnSelchangeComboFrom)
+	ON_CBN_SELCHANGE(IDC_COMBO_TO, &CTranslateApiDlg::OnCbnSelchangeComboTo)
+	ON_MESSAGE(WM_MSG_STATUS,&CTranslateApiDlg::OnMessageReceive)
+END_MESSAGE_MAP()
+
+
+// CTranslateApiDlg 消息处理程序
+
+CString getComboValue(CComboBox& combobox,std::vector<combo_value_type> list)
+{
+	int selected = combobox.GetCurSel();
+	std::vector<combo_value_type>::iterator it = list.begin();
+	combo_value_type tmp = *(it+selected);
+	return tmp.value;
 }
 BOOL CTranslateApiDlg::OnInitDialog()
 {
@@ -46,6 +80,17 @@ BOOL CTranslateApiDlg::OnInitDialog()
 
 	// 设置此对话框的图标。当应用程序主窗口不是对话框时，框架将自动
 	//  执行此操作
+		//Add Status Bar
+	if (!m_statusbar_status.Create(this) ||
+        !m_statusbar_status.SetIndicators(indicators_translate_api_dlg,sizeof(indicators_translate_api_dlg)/sizeof(UINT))
+        )
+	{
+		   TRACE0("Failed to create status bar\n");
+		   return -1;      // fail to create
+	}
+	m_statusbar_status.SetPaneInfo(0,indicators_translate_api_dlg[0],SBPS_STRETCH,400);	
+    
+    RepositionBars(AFX_IDW_CONTROLBAR_FIRST,AFX_IDW_CONTROLBAR_LAST,AFX_IDW_CONTROLBAR_FIRST);
 	
 	addCombo(L"Chinese",L"zh");
 	addCombo(L"English",L"en");
@@ -59,7 +104,7 @@ BOOL CTranslateApiDlg::OnInitDialog()
 	addCombo(L"Portuguese",L"pt");
 	
 	
-	std::list<combo_value_type>::iterator it = m_list_combo.begin();
+	std::vector<combo_value_type>::iterator it = m_list_combo.begin();
 	for(;it!=m_list_combo.end();++it)
 	{
 		Util::LOG(L"name=%s value=%s\n",(*it).name,(*it).value);
@@ -67,7 +112,9 @@ BOOL CTranslateApiDlg::OnInitDialog()
 		m_combo_to.AddString((*it).name);
 	}
 	m_combo_from.SetCurSel(0);
-	m_combo_to.SetCurSel(1);
+	m_combo_to.SetCurSel(0);
+
+	SendMessageStatus(MSG_TYPE::MSG_Finish);
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 void CTranslateApiDlg::addCombo(CString key,CString value)
@@ -75,29 +122,6 @@ void CTranslateApiDlg::addCombo(CString key,CString value)
 	combo_value_type m_combo_value_type = {key,value};	
 	m_list_combo.push_back(m_combo_value_type);
 }
-void CTranslateApiDlg::DoDataExchange(CDataExchange* pDX)
-{
-	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_EDIT_PATH, m_edit_excel_path);
-	DDX_Control(pDX, IDC_COMBO_FROM, m_combo_from);
-	DDX_Control(pDX, IDC_COMBO_TO, m_combo_to);
-	DDX_Control(pDX, IDC_EDIT_FROM, m_edit_from);
-	DDX_Control(pDX, IDC_EDIT_TO, m_edit_to);
-}
-
-
-BEGIN_MESSAGE_MAP(CTranslateApiDlg, CDialogEx)
-	ON_WM_CLOSE()
-	
-	ON_BN_CLICKED(IDC_BTN_GO_TRANSLATE, &CTranslateApiDlg::OnBnClickedBtnGoTranslate)
-	ON_BN_CLICKED(IDC_BTN_BROWSER, &CTranslateApiDlg::OnBnClickedBtnBrowser)
-	ON_CBN_SELCHANGE(IDC_COMBO_FROM, &CTranslateApiDlg::OnCbnSelchangeComboFrom)
-	ON_CBN_SELCHANGE(IDC_COMBO_TO, &CTranslateApiDlg::OnCbnSelchangeComboTo)
-END_MESSAGE_MAP()
-
-
-// CTranslateApiDlg 消息处理程序
-
 
 BOOL CTranslateApiDlg::PreTranslateMessage(MSG* pMsg)
 {
@@ -168,14 +192,24 @@ void CALL_BACK_HTTP(unsigned long code,TCHAR* result)
 }
 UINT ThreadHttpRequest(LPVOID lpvoid)
 {	
+	CTranslateApiDlg* dlg = (CTranslateApiDlg*)lpvoid;
 	TCHAR url_request_tmp[500];
 	
-	CString q = Util::UrlEncode(L"这是一个苹果");
-	Util::getUrl(url_request_tmp,q.GetBuffer(),L"zh",L"en");
+	CString q;
+	
+	CString from = getComboValue(dlg->m_combo_from,dlg->m_list_combo);
+	CString to = getComboValue(dlg->m_combo_to,dlg->m_list_combo);
+
+	if("en"!=from.Trim())    //When the q is not from English, encode it to utf8
+		q = Util::UrlEncode(q);
+
+	Util::getUrl(url_request_tmp,q.GetBuffer(),from.GetBuffer(),to.GetBuffer());
+	from.ReleaseBuffer();
+	to.ReleaseBuffer();
 	q.ReleaseBuffer();	
 
-	CHttpTool httpTool;
-	httpTool.request(url_request_tmp,CALL_BACK_HTTP);
+	//CHttpTool httpTool;
+	//httpTool.request(url_request_tmp,CALL_BACK_HTTP);
 	//Util::LOG(L"Finish");
 	return 0;
 }
@@ -183,6 +217,22 @@ UINT ThreadHttpRequest(LPVOID lpvoid)
 void CTranslateApiDlg::OnBnClickedBtnGoTranslate()
 {
 	// TODO: 在此添加控件通知处理程序代码
+	CString excel_path;
+	m_edit_excel_path.GetWindowTextW(excel_path);
+
+	if(""==excel_path.Trim()){
+		MessageBox(L"Excel path cannot be empty!");
+		return;
+	}
+
+	if(!Util::IsExistFile(excel_path)){
+		MessageBox(L"Excel file not exist!");
+		return;
+	}
+
+	ExcelTool::getInstance()->Open(excel_path);
+
+	ExcelTool::getInstance()->Close();
 	AfxBeginThread(ThreadHttpRequest,this);
 }
 
@@ -190,18 +240,42 @@ void CTranslateApiDlg::OnBnClickedBtnGoTranslate()
 void CTranslateApiDlg::OnBnClickedBtnBrowser()
 {
 	// TODO: 在此添加控件通知处理程序代码
+		// TODO: 在此添加控件通知处理程序代码
+	CString strFilter = _T("Excel files(*.xls)|*.xls||");
+	CFileDialog FileDlg(true,NULL,NULL,
+						OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT,
+						strFilter,this);
+	if(FileDlg.DoModal()!=IDOK) return;
+	CString strFileName = FileDlg.GetPathName();
+	m_edit_excel_path.SetWindowText(strFileName);
 }
 
 
 void CTranslateApiDlg::OnCbnSelchangeComboFrom()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	m_combo_from.GetCurSel();
-	
+	/*int selected = m_combo_from.GetCurSel();
+	std::vector<combo_value_type>::iterator it = m_list_combo.begin();
+	combo_value_type tmp = *(it+selected);
+	Util::LOG(L"selected=%d\tname=%s\tvalue=%s",selected,tmp.name,tmp.value);	
+	*/
 }
 
 
 void CTranslateApiDlg::OnCbnSelchangeComboTo()
 {
 	// TODO: 在此添加控件通知处理程序代码
+
+}
+
+void CTranslateApiDlg::SendMessageStatus(MSG_TYPE type)
+{
+	SendMessage(WM_MSG_STATUS,type,0);
+}
+
+LONG CTranslateApiDlg::OnMessageReceive(WPARAM wParam,LPARAM lParam)
+{
+	Util::LOG(L"CTranslateApiDlg::OnMessageReceive");
+
+	return 0;
 }

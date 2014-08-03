@@ -12,6 +12,9 @@
 #endif
 
 
+UINT indicators[]={
+IDS_STRING_STATUS
+};
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
 class CAboutDlg : public CDialogEx
@@ -515,6 +518,7 @@ LONG CTranslateForAndroidDlg::OnMessageReceive(WPARAM wParam,LPARAM lParam)
 		}
 		break;	
 	}
+	Util::LOG(L"CTranslateForAndroidDlg::OnMessageReceive");
 	return 0;
 }
 
@@ -548,6 +552,8 @@ BOOL CTranslateForAndroidDlg::PreTranslateMessage(MSG* pMsg)
 
 return CDialog::PreTranslateMessage(pMsg);
 }
+
+
 void CTranslateForAndroidDlg::OnClose()
 {
 	CString xml_to_excel_path;

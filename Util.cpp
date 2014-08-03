@@ -281,3 +281,19 @@ LPBOOL pfUsedDefaultChar //ÖÁÉÙÓÐÒ»¸ö×Ö·û²»ÄÜ×ª»»ÎªÆä¶à×Ö½ÚÐÎÊ½£¬º¯Êý¾Í»á°ÑÕâ¸ö±
 	
 	 return CString(strEncodeData);
 }
+bool Util::IsExistFile(LPCWSTR pszFileName)
+{
+	WIN32_FIND_DATA FindFileData;
+	HANDLE hFind;
+
+	hFind = FindFirstFile(pszFileName, &FindFileData);
+
+	if (hFind == INVALID_HANDLE_VALUE) 
+	return false;
+	else
+	{
+	FindClose(hFind);
+	return true;
+	}
+	return false;
+}

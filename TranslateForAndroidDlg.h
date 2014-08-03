@@ -5,19 +5,10 @@
 #pragma once
 #include "afxwin.h"
 
-const int WM_MSG_STATUS = WM_USER+100;
 
-enum MSG_TYPE
-{
-	MSG_Processing,
-	MSG_Finish,
-	MSG_FinishParagraphProcessing,
-	MSG_Loading,
-	MSG_XML_PATH_Empty
-};
-static UINT indicators[]={
-IDS_STRING_STATUS
-};
+
+
+
 // CTranslateForAndroidDlg ¶Ô»°¿ò
 class CTranslateForAndroidDlg : public CDialogEx
 {
