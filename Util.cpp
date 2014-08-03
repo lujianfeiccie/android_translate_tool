@@ -15,10 +15,10 @@ void __cdecl Util::LOG(const TCHAR *format, ...)
 	p += _vsntprintf(p, sizeof buf - 1, format, args);
 	va_end(args);
 	while ( p > buf  &&  isspace(p[-1]) )
-	*--p = '/0';
-	*p++ = '/r';
-	*p++ = '/n';
-	*p   = '/0';
+	*--p = '\0';
+	*p++ = '\r';
+	*p++ = '\n';
+	*p   = '\0';
 	OutputDebugString(buf);
 }
 void Util::GetFileDirectory(TCHAR* fileDirectory)

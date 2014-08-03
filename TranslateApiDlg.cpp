@@ -20,10 +20,69 @@ CTranslateApiDlg::CTranslateApiDlg(CWnd* pParent /*=NULL*/)
 CTranslateApiDlg::~CTranslateApiDlg()
 {
 }
+BOOL CTranslateApiDlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
 
+	// 将“关于...”菜单项添加到系统菜单中。
+
+	// IDM_ABOUTBOX 必须在系统命令范围内。
+	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
+	ASSERT(IDM_ABOUTBOX < 0xF000);
+
+	CMenu* pSysMenu = GetSystemMenu(FALSE);
+	if (pSysMenu != NULL)
+	{
+		BOOL bNameValid;
+		CString strAboutMenu;
+		bNameValid = strAboutMenu.LoadString(IDS_ABOUTBOX);
+		ASSERT(bNameValid);
+		if (!strAboutMenu.IsEmpty())
+		{
+			pSysMenu->AppendMenu(MF_SEPARATOR);
+			pSysMenu->AppendMenu(MF_STRING, IDM_ABOUTBOX, strAboutMenu);
+		}
+	}
+
+	// 设置此对话框的图标。当应用程序主窗口不是对话框时，框架将自动
+	//  执行此操作
+	
+	addCombo(L"Chinese",L"zh");
+	addCombo(L"English",L"en");
+	addCombo(L"Japanese",L"jp");
+	addCombo(L"Korean",L"kor");
+	addCombo(L"Spanish",L"spa");
+	addCombo(L"Franch",L"fra");
+	addCombo(L"Thai",L"th");
+	addCombo(L"Arab",L"ara");
+	addCombo(L"Russian",L"ru");
+	addCombo(L"Portuguese",L"pt");
+	
+	
+	std::list<combo_value_type>::iterator it = m_list_combo.begin();
+	for(;it!=m_list_combo.end();++it)
+	{
+		Util::LOG(L"name=%s value=%s\n",(*it).name,(*it).value);
+		m_combo_from.AddString((*it).name);
+		m_combo_to.AddString((*it).name);
+	}
+	m_combo_from.SetCurSel(0);
+	m_combo_to.SetCurSel(1);
+	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
+}
+void CTranslateApiDlg::addCombo(CString key,CString value)
+{	
+	combo_value_type m_combo_value_type = {key,value};	
+	m_list_combo.push_back(m_combo_value_type);
+}
 void CTranslateApiDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_EDIT_PATH, m_edit_excel_path);
+	DDX_Control(pDX, IDC_COMBO_FROM, m_combo_from);
+	DDX_Control(pDX, IDC_COMBO_TO, m_combo_to);
+	DDX_Control(pDX, IDC_EDIT_FROM, m_edit_from);
+	DDX_Control(pDX, IDC_EDIT_TO, m_edit_to);
 }
 
 
@@ -31,6 +90,9 @@ BEGIN_MESSAGE_MAP(CTranslateApiDlg, CDialogEx)
 	ON_WM_CLOSE()
 	
 	ON_BN_CLICKED(IDC_BTN_GO_TRANSLATE, &CTranslateApiDlg::OnBnClickedBtnGoTranslate)
+	ON_BN_CLICKED(IDC_BTN_BROWSER, &CTranslateApiDlg::OnBnClickedBtnBrowser)
+	ON_CBN_SELCHANGE(IDC_COMBO_FROM, &CTranslateApiDlg::OnCbnSelchangeComboFrom)
+	ON_CBN_SELCHANGE(IDC_COMBO_TO, &CTranslateApiDlg::OnCbnSelchangeComboTo)
 END_MESSAGE_MAP()
 
 
@@ -108,14 +170,12 @@ UINT ThreadHttpRequest(LPVOID lpvoid)
 {	
 	TCHAR url_request_tmp[500];
 	
-//	unsigned long low2= tmp[3];
-	
-	CString q = Util::UrlEncode(L"今");
+	CString q = Util::UrlEncode(L"这是一个苹果");
 	Util::getUrl(url_request_tmp,q.GetBuffer(),L"zh",L"en");
 	q.ReleaseBuffer();	
 
-	/*CHttpTool httpTool;
-	httpTool.request(url_request_tmp,CALL_BACK_HTTP);*/
+	CHttpTool httpTool;
+	httpTool.request(url_request_tmp,CALL_BACK_HTTP);
 	//Util::LOG(L"Finish");
 	return 0;
 }
@@ -124,4 +184,24 @@ void CTranslateApiDlg::OnBnClickedBtnGoTranslate()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	AfxBeginThread(ThreadHttpRequest,this);
+}
+
+
+void CTranslateApiDlg::OnBnClickedBtnBrowser()
+{
+	// TODO: 在此添加控件通知处理程序代码
+}
+
+
+void CTranslateApiDlg::OnCbnSelchangeComboFrom()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	m_combo_from.GetCurSel();
+	
+}
+
+
+void CTranslateApiDlg::OnCbnSelchangeComboTo()
+{
+	// TODO: 在此添加控件通知处理程序代码
 }
