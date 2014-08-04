@@ -46,4 +46,5 @@ public:
 	CStatusBar m_statusbar_status;
 	void SendMessageStatus(MSG_TYPE type);
 	LONG OnMessageReceive(WPARAM wParam,LPARAM lParam);
+	CString m_str_excel_path;
 };

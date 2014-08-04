@@ -1,5 +1,6 @@
 #pragma once
 
+typedef void (*EXCEL_CALL_BACK) (CString str,LPVOID lpvoid);
 
 class ExcelTool
 {
@@ -20,4 +21,5 @@ public:
 	void Close();
 	void Add(CString text);
 	void GetString(CString chinese,CString foreign,CString &result,BOOL fuzzy=TRUE);
+	void GetString(EXCEL_CALL_BACK callback=NULL,LPVOID lpvoid=NULL);
 };

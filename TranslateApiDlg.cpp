@@ -182,20 +182,20 @@ void CALL_BACK_HTTP(unsigned long code,TCHAR* result)
 		cstr_src = str_src.c_str();
 		cstr_dst = str_dst.c_str();
 		
-		//unsigned char high = str_dst.c_str()[0];
-		//unsigned char low = str_dst.c_str()[1];
-
-		//char str_tmp[1024];
-		//Util::enc_utf8_to_unicode_one(str_dst.c_str(),str_tmp);
+		
 	}
 
 }
-UINT ThreadHttpRequest(LPVOID lpvoid)
-{	
-	CTranslateApiDlg* dlg = (CTranslateApiDlg*)lpvoid;
-	TCHAR url_request_tmp[500];
+
+void CallBack_getFromExcel(CString result,LPVOID lpvoid)
+{
+	if(""==result.Trim()) return;
+    CTranslateApiDlg* dlg = (CTranslateApiDlg*)lpvoid;
+	Util::LOG(L"CallBack_getFromExcel=");
+	//Util::LOG(result);
+		TCHAR url_request_tmp[500];
 	
-	CString q;
+	CString q=result;
 	
 	CString from = getComboValue(dlg->m_combo_from,dlg->m_list_combo);
 	CString to = getComboValue(dlg->m_combo_to,dlg->m_list_combo);
@@ -208,9 +208,22 @@ UINT ThreadHttpRequest(LPVOID lpvoid)
 	to.ReleaseBuffer();
 	q.ReleaseBuffer();	
 
-	//CHttpTool httpTool;
-	//httpTool.request(url_request_tmp,CALL_BACK_HTTP);
+//	CHttpTool httpTool;
+//	httpTool.request(url_request_tmp,CALL_BACK_HTTP);
+}
+UINT ThreadHttpRequest(LPVOID lpvoid)
+{	
+	CTranslateApiDlg* dlg = (CTranslateApiDlg*)lpvoid;
+	
+
 	//Util::LOG(L"Finish");
+
+	ExcelTool::getInstance()->Open(dlg->m_str_excel_path);
+	Util::LOG(L"Open");
+	ExcelTool::getInstance()->GetString(CallBack_getFromExcel,lpvoid);
+	Util::LOG(L"GetString");
+	ExcelTool::getInstance()->Close();
+	Util::LOG(L"Close");
 	return 0;
 }
 
@@ -229,10 +242,8 @@ void CTranslateApiDlg::OnBnClickedBtnGoTranslate()
 		MessageBox(L"Excel file not exist!");
 		return;
 	}
-
-	ExcelTool::getInstance()->Open(excel_path);
-
-	ExcelTool::getInstance()->Close();
+	SendMessageStatus(MSG_TYPE::MSG_Processing);
+	m_str_excel_path = excel_path;
 	AfxBeginThread(ThreadHttpRequest,this);
 }
 

@@ -198,3 +198,31 @@ void ExcelTool::GetString(CString chinese,CString foreign,CString &result,BOOL f
 
 	
 }
+
+void ExcelTool::GetString(EXCEL_CALL_BACK callback,LPVOID lpvoid)
+{
+	CString sSql;
+		sSql.Format(L"SELECT 中文 from [Sheet1$]");
+	
+	CRecordset recset(database);
+	recset.Open(CRecordset::forwardOnly, sSql, CRecordset::readOnly);
+
+	if(callback==NULL) return;
+	TRY
+    {
+		while (!recset.IsEOF())
+       {
+            //读取Excel内部数值
+		    CString str_chinese;
+			recset.GetFieldValue(L"中文", str_chinese);       
+			callback(str_chinese,lpvoid);
+			//Util::LOG("%s %s",str_chinese,str_english);
+			recset.MoveNext();
+	    }
+	     recset.Close();
+	}
+    CATCH(CDBException, e)
+	{
+	}
+	END_CATCH	
+}
