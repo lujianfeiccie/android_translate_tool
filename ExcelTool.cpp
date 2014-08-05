@@ -161,17 +161,23 @@ CString ExcelTool::GetExcelDriver()
 void ExcelTool::Add(CString text)
 {
 	CString sSql;
-	sSql.Format(TEXT("INSERT INTO [sheet1$](中文) VALUES('%s')"),text);
+	sSql.Format(TEXT("INSERT INTO [sheet1$](Origin) VALUES('%s')"),text);
+	database->ExecuteSQL(sSql);
+}
+void ExcelTool::Update(CString origin,CString other)
+{
+	CString sSql;
+	sSql.Format(TEXT("UPDATE [sheet1$] SET Other = '%s' WHERE Origin like '%s'"),other,origin);
 	database->ExecuteSQL(sSql);
 }
 void ExcelTool::GetString(CString chinese,CString foreign,CString &result,BOOL fuzzy)
 {
 	CString sSql;
 	if(fuzzy==TRUE){
-		sSql.Format(TEXT("SELECT 中文,%s from [Sheet1$] where 中文 like '%%%s%%'"),
+		sSql.Format(TEXT("SELECT Origin,%s from [Sheet1$] where Origin like '%%%s%%'"),
 		foreign,chinese);
 	}else{
-		sSql.Format(TEXT("SELECT 中文,%s from [Sheet1$] where 中文 like '%s'"),
+		sSql.Format(TEXT("SELECT Origin,%s from [Sheet1$] where Origin like '%s'"),
 		foreign,chinese);
 	}
 	CRecordset recset(database);
@@ -202,20 +208,34 @@ void ExcelTool::GetString(CString chinese,CString foreign,CString &result,BOOL f
 void ExcelTool::GetString(EXCEL_CALL_BACK callback,LPVOID lpvoid)
 {
 	CString sSql;
-		sSql.Format(L"SELECT 中文 from [Sheet1$]");
+	
 	
 	CRecordset recset(database);
+
+	sSql= _T("SELECT COUNT(Origin) as MyCount from [Sheet1$]");
+	recset.Open(CRecordset::forwardOnly, sSql, CRecordset::readOnly);
+	CString str;
+	recset.GetFieldValue(L"MyCount", str);	
+	recset.Close();
+
+	sSql = L"SELECT Origin from [Sheet1$]";
 	recset.Open(CRecordset::forwardOnly, sSql, CRecordset::readOnly);
 
 	if(callback==NULL) return;
+
+	int index = 0;
+	int count = _wtoi(str);
+	
 	TRY
     {
+		
 		while (!recset.IsEOF())
        {
             //读取Excel内部数值
 		    CString str_chinese;
-			recset.GetFieldValue(L"中文", str_chinese);       
-			callback(str_chinese,lpvoid);
+
+			recset.GetFieldValue(L"Origin", str_chinese);       
+			callback(str_chinese,count,index,lpvoid);
 			//Util::LOG("%s %s",str_chinese,str_english);
 			recset.MoveNext();
 	    }

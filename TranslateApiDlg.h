@@ -44,7 +44,7 @@ public:
 	afx_msg void OnCbnSelchangeComboFrom();
 	afx_msg void OnCbnSelchangeComboTo();	
 	CStatusBar m_statusbar_status;
-	void SendMessageStatus(MSG_TYPE type);
+	void SendMessageStatus(MSG_TYPE type,CString msg=NULL);
 	LONG OnMessageReceive(WPARAM wParam,LPARAM lParam);
 	CString m_str_excel_path;
 };

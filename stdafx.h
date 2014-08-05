@@ -81,5 +81,6 @@ enum MSG_TYPE
 	MSG_Finish,
 	MSG_FinishParagraphProcessing,
 	MSG_Loading,
-	MSG_XML_PATH_Empty
+	MSG_XML_PATH_Empty,
+	MSG_Other
 };

@@ -182,20 +182,20 @@ void CALL_BACK_HTTP(unsigned long code,TCHAR* result)
 		cstr_src = str_src.c_str();
 		cstr_dst = str_dst.c_str();
 		
-		
+		ExcelTool::getInstance()->Update(cstr_src,cstr_dst);
 	}
 
 }
 
-void CallBack_getFromExcel(CString result,LPVOID lpvoid)
+void CallBack_getFromExcel(CString str,int total,int index,LPVOID lpvoid)
 {
-	if(""==result.Trim()) return;
+	if(""==str.Trim()) return;
     CTranslateApiDlg* dlg = (CTranslateApiDlg*)lpvoid;
 	Util::LOG(L"CallBack_getFromExcel=");
 	//Util::LOG(result);
 		TCHAR url_request_tmp[500];
 	
-	CString q=result;
+	CString q=str;
 	
 	CString from = getComboValue(dlg->m_combo_from,dlg->m_list_combo);
 	CString to = getComboValue(dlg->m_combo_to,dlg->m_list_combo);
@@ -208,8 +208,11 @@ void CallBack_getFromExcel(CString result,LPVOID lpvoid)
 	to.ReleaseBuffer();
 	q.ReleaseBuffer();	
 
-//	CHttpTool httpTool;
-//	httpTool.request(url_request_tmp,CALL_BACK_HTTP);
+	CString msg;
+	msg.Format(L"Processing %d/%d",index+1,total);
+	dlg->SendMessageStatus(MSG_TYPE::MSG_Other,msg);
+	CHttpTool httpTool;
+	httpTool.request(url_request_tmp,CALL_BACK_HTTP);
 }
 UINT ThreadHttpRequest(LPVOID lpvoid)
 {	
@@ -217,13 +220,14 @@ UINT ThreadHttpRequest(LPVOID lpvoid)
 	
 
 	//Util::LOG(L"Finish");
-
+	dlg->SendMessageStatus(MSG_TYPE::MSG_Processing);
 	ExcelTool::getInstance()->Open(dlg->m_str_excel_path);
 	Util::LOG(L"Open");
 	ExcelTool::getInstance()->GetString(CallBack_getFromExcel,lpvoid);
 	Util::LOG(L"GetString");
 	ExcelTool::getInstance()->Close();
 	Util::LOG(L"Close");
+	dlg->SendMessageStatus(MSG_TYPE::MSG_Finish);
 	return 0;
 }
 
@@ -279,14 +283,39 @@ void CTranslateApiDlg::OnCbnSelchangeComboTo()
 
 }
 
-void CTranslateApiDlg::SendMessageStatus(MSG_TYPE type)
+void CTranslateApiDlg::SendMessageStatus(MSG_TYPE type,CString msg)
 {
-	SendMessage(WM_MSG_STATUS,type,0);
+	SendMessage(WM_MSG_STATUS,type,(LPARAM)msg.GetBuffer());
+	msg.ReleaseBuffer();
 }
 
 LONG CTranslateApiDlg::OnMessageReceive(WPARAM wParam,LPARAM lParam)
 {
 	Util::LOG(L"CTranslateApiDlg::OnMessageReceive");
-
+	MSG_TYPE type = (MSG_TYPE)wParam;
+	CString msg = (TCHAR*)lParam;
+	switch(type)
+	{
+	case MSG_TYPE::MSG_Loading:
+		{
+			m_statusbar_status.SetPaneText(0,L"Loading");
+		}
+		break;
+	case MSG_TYPE::MSG_Processing:
+		{
+			m_statusbar_status.SetPaneText(0,L"Processing");
+		}
+		break;
+	case MSG_TYPE::MSG_Finish:
+		{
+			m_statusbar_status.SetPaneText(0,L"Finish");
+		}
+		break;
+	case MSG_TYPE::MSG_Other:
+		{
+			m_statusbar_status.SetPaneText(0,msg);
+		}
+		break;
+	}
 	return 0;
 }
