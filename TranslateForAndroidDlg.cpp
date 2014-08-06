@@ -73,6 +73,8 @@ void CTranslateForAndroidDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK_FUZZY, m_check_fuzzy);
 	DDX_Control(pDX, ID_BTN_GO, m_btn_go_xml2excel);
 	DDX_Control(pDX, IDC_BUTTON_TEST, m_btn_go_excel2xml);
+	DDX_Control(pDX, IDC_BTN_BROWSER_TO_EXCEL, m_btn_browser_xml2excel);
+	DDX_Control(pDX, IDC_BTN_EXCEL_BROWSER, m_btn_browser_excel_path);
 }
 
 BEGIN_MESSAGE_MAP(CTranslateForAndroidDlg, CDialogEx)
@@ -181,7 +183,7 @@ BOOL CTranslateForAndroidDlg::OnInitDialog()
 	m_radio_single.SetCheck("1"==singleFile);
 	m_radio_directory.SetCheck("1"!=singleFile);
 	m_check_fuzzy.SetCheck("1"==fuzzy);
-
+	m_int_check_fuzzy = m_check_fuzzy.GetCheck();
 		//Add Status Bar
 	if (!m_statusbar_status.Create(this) ||
         !m_statusbar_status.SetIndicators(indicators,sizeof(indicators)/sizeof(UINT))
@@ -337,7 +339,7 @@ void CTranslateForAndroidDlg::WriteXml(CString filePath,CString language)
 UINT ThreadExcelToXml(LPVOID lpvoid)
 {
 	CTranslateForAndroidDlg* dlg = (CTranslateForAndroidDlg*)lpvoid;
-	if(dlg->m_int_check_fuzzy!=0){
+	if(dlg->m_radio_single.GetCheck()!=0){
 		ExcelTool::getInstance()->Open(dlg->m_str_excel_path);
 	
 		dlg->WriteXml(dlg->m_str_xml_path,dlg->m_str_language);
@@ -456,13 +458,16 @@ CString CTranslateForAndroidDlg::ShowDirectoryDlg()
             ::CoTaskMemFree(lpidlBrowse);  
         }  
   
+		
         return strFolderPath;  
 }
 
 void CTranslateForAndroidDlg::OnBnClickedBtnBrowserDirectory()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	m_edit_xml_directory.SetWindowText(ShowDirectoryDlg());
+	CString tmp = ShowDirectoryDlg();
+	if(""!=tmp.Trim())
+	m_edit_xml_directory.SetWindowText(tmp);
 }
 
 void CTranslateForAndroidDlg::setRadioEnableForSingle(BOOL m_b_flag)
@@ -491,24 +496,23 @@ LONG CTranslateForAndroidDlg::OnMessageReceive(WPARAM wParam,LPARAM lParam)
 	{	
 	case MSG_TYPE::MSG_Processing:
 		{
-			m_btn_go_excel2xml.EnableWindow(FALSE);
-			m_btn_go_xml2excel.EnableWindow(FALSE);
-
-		    m_statusbar_status.SetPaneText(0,L"Processing");
+			m_statusbar_status.SetPaneText(0,L"Processing");
+			setEnable(FALSE);
 		}
 		break;
 	case MSG_TYPE::MSG_Finish:
 		{
-			m_btn_go_excel2xml.EnableWindow(TRUE);
-			m_btn_go_xml2excel.EnableWindow(TRUE);
+			setEnable(TRUE);
 
 			m_statusbar_status.SetPaneText(0,L"Finish");
 			MessageBox(L"Success",L"Prompt");
+
 		}
 		break;
 	case MSG_TYPE::MSG_Loading:
 		{
 		    m_statusbar_status.SetPaneText(0,L"Loading");
+			setEnable(FALSE);
 		}
 		break;
 	case MSG_TYPE::MSG_XML_PATH_Empty:
@@ -552,7 +556,23 @@ BOOL CTranslateForAndroidDlg::PreTranslateMessage(MSG* pMsg)
 
 return CDialog::PreTranslateMessage(pMsg);
 }
-
+void CTranslateForAndroidDlg::setEnable(BOOL enable)
+{
+	m_edit_xml_to_excel.EnableWindow(enable == TRUE);
+	m_edit_excel_path.EnableWindow(enable == TRUE);
+	m_edit_language.EnableWindow(enable == TRUE);
+	m_edit_xml_directory.EnableWindow(enable == TRUE);
+	m_edit_xml_path.EnableWindow(enable == TRUE);
+	m_btn_browser_directory.EnableWindow(enable == TRUE);
+	m_btn_browser_xml_path.EnableWindow(enable == TRUE);
+	m_btn_go_excel2xml.EnableWindow(enable == TRUE);
+	m_btn_go_xml2excel.EnableWindow(enable == TRUE);
+	m_btn_browser_xml2excel.EnableWindow(enable == TRUE);
+	m_btn_browser_excel_path.EnableWindow(enable == TRUE);
+	m_check_fuzzy.EnableWindow(enable == TRUE);
+	m_radio_directory.EnableWindow(enable == TRUE);
+	m_radio_single.EnableWindow(enable == TRUE);
+}
 
 void CTranslateForAndroidDlg::OnClose()
 {

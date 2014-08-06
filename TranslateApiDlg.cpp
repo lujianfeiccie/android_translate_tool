@@ -29,8 +29,9 @@ void CTranslateApiDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_PATH, m_edit_excel_path);
 	DDX_Control(pDX, IDC_COMBO_FROM, m_combo_from);
 	DDX_Control(pDX, IDC_COMBO_TO, m_combo_to);
-	DDX_Control(pDX, IDC_EDIT_FROM, m_edit_from);
-	DDX_Control(pDX, IDC_EDIT_TO, m_edit_to);
+
+	DDX_Control(pDX, IDC_BTN_GO_TRANSLATE, m_btn_go_translate);
+	DDX_Control(pDX, IDC_BTN_BROWSER, m_btn_browser);
 }
 
 
@@ -113,8 +114,7 @@ BOOL CTranslateApiDlg::OnInitDialog()
 	}
 	m_combo_from.SetCurSel(0);
 	m_combo_to.SetCurSel(0);
-
-	SendMessageStatus(MSG_TYPE::MSG_Finish);
+	
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 void CTranslateApiDlg::addCombo(CString key,CString value)
@@ -138,11 +138,7 @@ BOOL CTranslateApiDlg::PreTranslateMessage(MSG* pMsg)
 
 		case 'A':
 		if (bCtrl){
-			/*m_edit_excel_path.SetSel(0,-1);
-			m_edit_language.SetSel(0,-1);
-			m_edit_xml_directory.SetSel(0,-1);
-			m_edit_xml_path.SetSel(0,-1);
-			m_edit_xml_to_excel.SetSel(0,-1);*/
+			m_edit_excel_path.SetSel(0,-1);
 		}
 		break;
 		}
@@ -269,18 +265,28 @@ void CTranslateApiDlg::OnBnClickedBtnBrowser()
 void CTranslateApiDlg::OnCbnSelchangeComboFrom()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	/*int selected = m_combo_from.GetCurSel();
-	std::vector<combo_value_type>::iterator it = m_list_combo.begin();
-	combo_value_type tmp = *(it+selected);
-	Util::LOG(L"selected=%d\tname=%s\tvalue=%s",selected,tmp.name,tmp.value);	
-	*/
+	int selected1 = m_combo_from.GetCurSel();
+	int selected2 = m_combo_to.GetCurSel();
+	
+	if(selected1 == selected2){
+		int size = m_list_combo.size();
+		++selected2;
+		m_combo_to.SetCurSel(selected2 % size);
+	}
 }
 
 
 void CTranslateApiDlg::OnCbnSelchangeComboTo()
 {
 	// TODO: 在此添加控件通知处理程序代码
-
+	int selected1 = m_combo_to.GetCurSel();
+	int selected2 = m_combo_from.GetCurSel();
+	
+	if(selected1 == selected2){
+		int size = m_list_combo.size();
+		++selected2;
+		m_combo_from.SetCurSel(selected2 % size);
+	}
 }
 
 void CTranslateApiDlg::SendMessageStatus(MSG_TYPE type,CString msg)
@@ -288,7 +294,14 @@ void CTranslateApiDlg::SendMessageStatus(MSG_TYPE type,CString msg)
 	SendMessage(WM_MSG_STATUS,type,(LPARAM)msg.GetBuffer());
 	msg.ReleaseBuffer();
 }
-
+void CTranslateApiDlg::setEnable(BOOL enable)
+{
+	m_edit_excel_path.EnableWindow(enable==TRUE);
+	m_btn_browser.EnableWindow(enable==TRUE);
+	m_combo_from.EnableWindow(enable==TRUE);
+	m_combo_to.EnableWindow(enable==TRUE);
+	m_btn_go_translate.EnableWindow(enable==TRUE);
+}
 LONG CTranslateApiDlg::OnMessageReceive(WPARAM wParam,LPARAM lParam)
 {
 	Util::LOG(L"CTranslateApiDlg::OnMessageReceive");
@@ -299,16 +312,20 @@ LONG CTranslateApiDlg::OnMessageReceive(WPARAM wParam,LPARAM lParam)
 	case MSG_TYPE::MSG_Loading:
 		{
 			m_statusbar_status.SetPaneText(0,L"Loading");
+			setEnable(FALSE);			
 		}
 		break;
 	case MSG_TYPE::MSG_Processing:
 		{
 			m_statusbar_status.SetPaneText(0,L"Processing");
+			setEnable(FALSE);		
 		}
 		break;
 	case MSG_TYPE::MSG_Finish:
 		{
 			m_statusbar_status.SetPaneText(0,L"Finish");
+			setEnable(TRUE);
+			MessageBox(L"Finish!");
 		}
 		break;
 	case MSG_TYPE::MSG_Other:

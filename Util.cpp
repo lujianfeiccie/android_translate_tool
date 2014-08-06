@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "Util.h"
-
+//#define MY_DEBUG
 Util::Util(void)
 {
 }
@@ -9,6 +9,7 @@ Util::~Util(void)
 }
 void __cdecl Util::LOG(const TCHAR *format, ...)
 {
+#ifdef MY_DEBUG
 	TCHAR buf[4096], *p = buf;
 	va_list args;
 	va_start(args, format);
@@ -20,6 +21,7 @@ void __cdecl Util::LOG(const TCHAR *format, ...)
 	*p++ = '\n';
 	*p   = '\0';
 	OutputDebugString(buf);
+#endif
 }
 void Util::GetFileDirectory(TCHAR* fileDirectory)
 {
@@ -101,8 +103,6 @@ if(c>=0xFC) return 6;
 int Util::enc_unicode_to_utf8_one(unsigned long unic, unsigned char *pOutput,  
         int outSize)  
 {  
-    assert(pOutput != NULL);  
-    assert(outSize >= 6);  
   
     if ( unic <= 0x0000007F )  
     {  
@@ -160,7 +160,6 @@ int Util::enc_unicode_to_utf8_one(unsigned long unic, unsigned char *pOutput,
 }  
 int Util::enc_utf8_to_unicode_one(const unsigned char* pInput, unsigned long *Unic)  
 {  
-    assert(pInput != NULL && Unic != NULL);  
   
     // b1 表示UTF-8编码的pInput中的高字节, b2 表示次高字节, ...  
     char b1, b2, b3, b4, b5, b6;  

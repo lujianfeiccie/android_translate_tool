@@ -36,8 +36,7 @@ public:
 	afx_msg void OnBnClickedBtnBrowser();
 	CComboBox m_combo_from;
 	CComboBox m_combo_to;
-	CEdit m_edit_from;
-	CEdit m_edit_to;
+	
 	std::vector<combo_value_type> m_list_combo;
 
 	void addCombo(CString key,CString value);
@@ -46,5 +45,8 @@ public:
 	CStatusBar m_statusbar_status;
 	void SendMessageStatus(MSG_TYPE type,CString msg=NULL);
 	LONG OnMessageReceive(WPARAM wParam,LPARAM lParam);
+	void setEnable(BOOL enable);
 	CString m_str_excel_path;
+	CButton m_btn_go_translate;
+	CButton m_btn_browser;
 };

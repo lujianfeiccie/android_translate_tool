@@ -84,6 +84,8 @@ public:
 	CButton m_btn_go_excel2xml;
 
 	BOOL PreTranslateMessage(MSG* pMsg);
-
+	void setEnable(BOOL enable);
 	afx_msg void OnToolTranslate();
+	CButton m_btn_browser_xml2excel;
+	CButton m_btn_browser_excel_path;
 };

@@ -174,10 +174,10 @@ void ExcelTool::GetString(CString chinese,CString foreign,CString &result,BOOL f
 {
 	CString sSql;
 	if(fuzzy==TRUE){
-		sSql.Format(TEXT("SELECT Origin,%s from [Sheet1$] where Origin like '%%%s%%'"),
+		sSql.Format(TEXT("SELECT 中文,%s from [Sheet1$] where 中文 like '%%%s%%'"),
 		foreign,chinese);
 	}else{
-		sSql.Format(TEXT("SELECT Origin,%s from [Sheet1$] where Origin like '%s'"),
+		sSql.Format(TEXT("SELECT 中文,%s from [Sheet1$] where 中文 like '%s'"),
 		foreign,chinese);
 	}
 	CRecordset recset(database);
@@ -192,7 +192,7 @@ void ExcelTool::GetString(CString chinese,CString foreign,CString &result,BOOL f
 			CString str_foreign;
 			recset.GetFieldValue(TEXT("中文"), str_chinese);       
 			recset.GetFieldValue(foreign, str_foreign);	
-			//Util::LOG("%s %s",str_chinese,str_english);
+			Util::LOG(L"%s %s",str_chinese,str_foreign);
 			result = str_foreign;
 	    }
 	     recset.Close();
@@ -238,6 +238,7 @@ void ExcelTool::GetString(EXCEL_CALL_BACK callback,LPVOID lpvoid)
 			callback(str_chinese,count,index,lpvoid);
 			//Util::LOG("%s %s",str_chinese,str_english);
 			recset.MoveNext();
+			++index;
 	    }
 	     recset.Close();
 	}
