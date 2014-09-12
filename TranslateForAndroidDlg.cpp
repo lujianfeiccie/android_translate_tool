@@ -330,8 +330,11 @@ void CTranslateForAndroidDlg::WriteXml(CString filePath,CString language)
 	while(xml.FindChildElem())
 	{
 			//Util::LOG("%s",xml.GetChildData());
-		ExcelTool::getInstance()->GetString(xml.GetChildData(),language,result,m_int_check_fuzzy);
-		Util::LOG(result);
+		result="";
+		CString chinese = xml.GetChildData();
+		chinese = chinese.Trim();
+		ExcelTool::getInstance()->GetString(chinese,language,result,m_int_check_fuzzy);
+	//	Util::LOG(result);
 		xml.SetChildData(result);
 	}	
 	xml.Save(filePath);
