@@ -61,6 +61,12 @@
     <ClInclude Include="Util.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="jfConvert.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpleToTraditionalDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TranslateForAndroid.cpp">
@@ -88,6 +94,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Util.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="jfConvert.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SimpleToTraditionalDlg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

@@ -66,7 +66,8 @@
 #include "ExcelTool.h"
 #include "Config.h"
 #include "HttpTool.h"
-
+#include "jfConvert.h"
+#include "SimpleToTraditionalDlg.h"
 #define EXCEL_FILE_NAME L"\\translate.xls"
 #define XML_FILE_NAME L"\\strings.xml"
 #define API_KEY L"MBawO2XZY7ULN8uYLC4NCHjr"

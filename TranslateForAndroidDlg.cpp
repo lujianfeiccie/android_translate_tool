@@ -92,6 +92,7 @@ BEGIN_MESSAGE_MAP(CTranslateForAndroidDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_RADIO_DIRECTORY, &CTranslateForAndroidDlg::OnBnClickedRadioDirectory)
 	ON_MESSAGE(WM_MSG_STATUS,&CTranslateForAndroidDlg::OnMessageReceive)
 	ON_COMMAND(ID_TOOL_TRANSLATE, &CTranslateForAndroidDlg::OnToolTranslate)
+	ON_COMMAND(ID__SIMPLETOTRANDITIONAL, &CTranslateForAndroidDlg::OnToolSimpleToTraditional)
 END_MESSAGE_MAP()
 
 
@@ -136,6 +137,9 @@ void WriteToFile(CString &xml_to_excel,
 	Config::WriteConfig(L"directory",directory);		
 	Config::WriteConfig(L"fuzzy",fuzzy);		
 }
+//这是把asii字符转换为unicode字符，和上面相同的原理
+
+
 BOOL CTranslateForAndroidDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
@@ -195,6 +199,8 @@ BOOL CTranslateForAndroidDlg::OnInitDialog()
 	m_statusbar_status.SetPaneInfo(0,indicators[0],SBPS_STRETCH,400);	
     
     RepositionBars(AFX_IDW_CONTROLBAR_FIRST,AFX_IDW_CONTROLBAR_LAST,AFX_IDW_CONTROLBAR_FIRST);
+	
+	
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -422,6 +428,7 @@ void CTranslateForAndroidDlg::SendMessageStatus(MSG_TYPE type)
 {
 	SendMessage(WM_MSG_STATUS,type,0);
 }
+
 void CTranslateForAndroidDlg::OnBnClickedBtnBrowserToExcel()
 {
 	// TODO: 在此添加控件通知处理程序代码
@@ -616,3 +623,11 @@ void CTranslateForAndroidDlg::OnToolTranslate()
 	dlg.DoModal();
 }
 
+
+
+void CTranslateForAndroidDlg::OnToolSimpleToTraditional()
+{
+	// TODO: 在此添加命令处理程序代码
+	CSimpleToTraditionalDlg dlg;
+	dlg.DoModal();
+}

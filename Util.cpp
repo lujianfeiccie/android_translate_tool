@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "Util.h"
-#define MY_DEBUG
+//#define MY_DEBUG
 Util::Util(void)
 {
 }

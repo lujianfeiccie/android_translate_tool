@@ -88,4 +88,5 @@ public:
 	afx_msg void OnToolTranslate();
 	CButton m_btn_browser_xml2excel;
 	CButton m_btn_browser_excel_path;
+	afx_msg void OnToolSimpleToTraditional();
 };
