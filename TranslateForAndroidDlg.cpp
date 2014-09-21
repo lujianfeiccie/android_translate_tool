@@ -7,6 +7,7 @@
 #include "TranslateForAndroidDlg.h"
 #include "afxdialogex.h"
 #include "TranslateApiDlg.h"
+#include "afxwin.h"
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -31,6 +32,9 @@ public:
 // й╣ож
 protected:
 	DECLARE_MESSAGE_MAP()
+public:
+	CStatic m_lbl_version;
+	virtual BOOL OnInitDialog();
 };
 
 CAboutDlg::CAboutDlg() : CDialogEx(CAboutDlg::IDD)
@@ -40,8 +44,15 @@ CAboutDlg::CAboutDlg() : CDialogEx(CAboutDlg::IDD)
 void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_STATIC_VERSION, m_lbl_version);
 }
-
+BOOL CAboutDlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+	
+	m_lbl_version.SetWindowTextW(VERSION);
+	return TRUE;
+}
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
 END_MESSAGE_MAP()
 

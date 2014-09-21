@@ -21,6 +21,7 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
+	BOOL PreTranslateMessage(MSG* pMsg);
 	CEdit m_edit_browser;
 	CButton m_btn_browser;
 	CButton m_btn_export;

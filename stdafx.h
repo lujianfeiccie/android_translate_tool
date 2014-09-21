@@ -85,3 +85,5 @@ enum MSG_TYPE
 	MSG_XML_PATH_Empty,
 	MSG_Other
 };
+
+#define VERSION L"Translation Tool, version 2.0\n\nAuthor:John Lu"
