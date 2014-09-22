@@ -13,13 +13,16 @@ void __cdecl Util::LOG(const TCHAR *format, ...)
 	TCHAR buf[4096], *p = buf;
 	va_list args;
 	va_start(args, format);
-	p += _vsntprintf(p, sizeof buf - 1, format, args);
+	int size = sizeof buf/2 - 1;
+	p += _vsnwprintf(p, size, format, args);
 	va_end(args);
-	while ( p > buf  &&  isspace(p[-1]) )
-	*--p = '\0';
-	*p++ = '\r';
-	*p++ = '\n';
-	*p   = '\0';
+	/*while ( p > buf  &&  iswspace(p[-1]))
+	{
+		*--p = '\0';
+		*p++ = '\r';
+		*p++ = '\n';
+		*p   = '\0';
+	}*/
 	OutputDebugString(buf);
 #endif
 }
