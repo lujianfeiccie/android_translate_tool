@@ -352,7 +352,10 @@ void CTranslateForAndroidDlg::WriteXml(CString filePath,CString language)
 		chinese = chinese.Trim();
 		ExcelTool::getInstance()->GetString(chinese,language,result,m_int_check_fuzzy);
 	//	Util::LOG(result);
-		xml.SetChildData(result);
+		if(result.Trim()!=L"")
+		{
+			xml.SetChildData(result);
+		}		
 	}	
 	xml.Save(filePath);
 }
@@ -582,8 +585,22 @@ void CTranslateForAndroidDlg::setEnable(BOOL enable)
 	m_edit_xml_to_excel.EnableWindow(enable == TRUE);
 	m_edit_excel_path.EnableWindow(enable == TRUE);
 	m_edit_language.EnableWindow(enable == TRUE);
-	m_edit_xml_directory.EnableWindow(enable == TRUE);
-	m_edit_xml_path.EnableWindow(enable == TRUE);
+
+  if(enable == TRUE)
+  {
+	if(m_radio_single.GetCheck())
+	{
+		m_edit_xml_path.EnableWindow(enable == TRUE);
+		m_edit_xml_directory.EnableWindow(enable != TRUE);
+	}
+	else
+	{
+		m_edit_xml_path.EnableWindow(enable != TRUE);
+		m_edit_xml_directory.EnableWindow(enable == TRUE);
+	}
+  }
+	
+	
 	m_btn_browser_directory.EnableWindow(enable == TRUE);
 	m_btn_browser_xml_path.EnableWindow(enable == TRUE);
 	m_btn_go_excel2xml.EnableWindow(enable == TRUE);
